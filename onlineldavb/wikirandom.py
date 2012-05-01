@@ -54,7 +54,7 @@ def get_random_wikipedia_article():
             failed = True
             continue
         print 'downloaded %s. parsing...' % articletitle
-
+		
         try:
             all = re.search(r'<text.*?>(.*)</text', all, flags=re.DOTALL).group(1)
             all = re.sub(r'\n', ' ', all)

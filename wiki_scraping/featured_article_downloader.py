@@ -2,7 +2,7 @@ import sys, urllib2, re, string, time, threading
 from BeautifulSoup import BeautifulSoup
 import os
 
-def get_specific_wikipedia_article(wiki_url):
+def get_specific_wikipedia_article(wiki_url, markup=True):
     """
     Downloads a randomly selected Wikipedia article (via
     http://en.wikipedia.org/wiki/Special:Random) and strips out (most
@@ -26,9 +26,13 @@ def get_specific_wikipedia_article(wiki_url):
                 break
             elif (len(line) < 1):
                 return None
-
-        req = urllib2.Request('http://en.wikipedia.org/w/index.php?title=Special:Export/%s&action=submit' \
-                                  % (articletitle),
+        
+        if markup:
+            base_url = 'http://en.wikipedia.org/w/index.php?title=Special:Export/%s&action=submit'
+        else:
+            base_url = 'http://en.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s'
+        
+        req = urllib2.Request(base_url % (articletitle),
                               None, { 'User-Agent' : 'x'})
         f = urllib2.urlopen(req)
         all = f.read()
@@ -42,22 +46,25 @@ def get_specific_wikipedia_article(wiki_url):
 
     try:
         # extract the text section of the xml. this is the wiki markup text.
-        all = re.search(r'<text.*?>(.*)</text', all, flags=re.DOTALL).group(1)
-        """
-        all = re.sub(r'\n', ' ', all)
-        all = re.sub(r'\{\{.*?\}\}', r'', all)
-        all = re.sub(r'\[\[Category:.*', '', all)
-        all = re.sub(r'==\s*[Ss]ource\s*==.*', '', all)
-        all = re.sub(r'==\s*[Rr]eferences\s*==.*', '', all)
-        all = re.sub(r'==\s*[Ee]xternal [Ll]inks\s*==.*', '', all)
-        all = re.sub(r'==\s*[Ee]xternal [Ll]inks and [Rr]eferences==\s*', '', all)
-        all = re.sub(r'==\s*[Ss]ee [Aa]lso\s*==.*', '', all)
-        all = re.sub(r'http://[^\s]*', '', all)
-        all = re.sub(r'\[\[Image:.*?\]\]', '', all)
-        all = re.sub(r'Image:.*?\|', '', all)
-        all = re.sub(r'\[\[.*?\|*([^\|]*?)\]\]', r'\1', all)
-        all = re.sub(r'\&lt;.*?&gt;', '', all)
-        """
+        if markup:
+            all = re.search(r'<text.*?>(.*)</text', all, flags=re.DOTALL).group(1)
+            """
+            all = re.sub(r'\n', ' ', all)
+            all = re.sub(r'\{\{.*?\}\}', r'', all)
+            all = re.sub(r'\[\[Category:.*', '', all)
+            all = re.sub(r'==\s*[Ss]ource\s*==.*', '', all)
+            all = re.sub(r'==\s*[Rr]eferences\s*==.*', '', all)
+            all = re.sub(r'==\s*[Ee]xternal [Ll]inks\s*==.*', '', all)
+            all = re.sub(r'==\s*[Ee]xternal [Ll]inks and [Rr]eferences==\s*', '', all)
+            all = re.sub(r'==\s*[Ss]ee [Aa]lso\s*==.*', '', all)
+            all = re.sub(r'http://[^\s]*', '', all)
+            all = re.sub(r'\[\[Image:.*?\]\]', '', all)
+            all = re.sub(r'Image:.*?\|', '', all)
+            all = re.sub(r'\[\[.*?\|*([^\|]*?)\]\]', r'\1', all)
+            all = re.sub(r'\&lt;.*?&gt;', '', all)
+            """
+        else:
+            all = re.search(r'<extract.*?>(.*)</extract', all, flags=re.DOTALL).group(1)
     except:
         # Something went wrong, try again. (This is bad coding practice.)
         print 'oops. there was a failure parsing %s.' \
@@ -78,8 +85,10 @@ class WikiThread(threading.Thread):
             article_title = article_title.replace('/', '_')
             f = open(new_dir + '/' + article_title, 'w')
             f.write(article_text)
+        else:
+            print "fail"
 
-def get_featured_wikipedia_articles(dirname):
+def get_featured_wikipedia_articles(dirname, markup=True):
     """
     Downloads n articles in parallel from Wikipedia and returns lists
     of their names and contents. Much faster than calling
@@ -125,7 +134,7 @@ def get_featured_wikipedia_articles(dirname):
         for rel_url in relative_url_list:
             url = 'http://en.wikipedia.org' + rel_url[6:-1]
             
-            result = get_specific_wikipedia_article(url)
+            result = get_specific_wikipedia_article(url, markup)
             if result != None:
                 (article_text, article_title) = result
                 article_title = article_title.replace('/', '_')
@@ -148,7 +157,7 @@ def get_featured_wikipedia_articles(dirname):
 def main():
     t0 = time.time()
 
-    get_featured_wikipedia_articles('featured_bios')
+    get_featured_wikipedia_articles('markup_featured_bios', True)
 
     t1 = time.time()
     print 'took %f' % (t1 - t0)
