@@ -1,8 +1,2 @@
-# Mac OS X dir structure files
 *.DS_Store
-
-# compiled Python files
 *.pyc
-
-# Emacs files
-*~
