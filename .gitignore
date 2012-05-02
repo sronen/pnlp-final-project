@@ -2,4 +2,7 @@
 *.DS_Store
 
 # compiled Python files
-.pyc
+*.pyc
+
+# Emacs files
+*~
