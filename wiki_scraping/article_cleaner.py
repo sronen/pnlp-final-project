@@ -13,26 +13,11 @@ def clean_plaintext_article(text, extract_topics=False):
         text = re.sub(r'&lt;h2&gt;\s*[Ss]ource\s*&lt;/h2&gt;.*', '', text, flags=re.DOTALL)
         text = re.sub(r'&lt;h2&gt;\s*[Rr]eferences\s*&lt;/h2&gt;.*', '', text, flags=re.DOTALL)
         text = re.sub(r'&lt;h2&gt;\s*[Ss]ee [Aa]lso\s*&lt;/h2&gt;.*', '', text, flags=re.DOTALL)
+        text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
         if extract_topics:
             return text
         text = re.sub(r'&lt;.*?&gt;', '', text) # remove all html tags
-        text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
         text = re.sub(r'&[^;\s]*?;', '', text) # remove all other markings, e.g. &quot;
-        """
-        all = re.sub(r'\n', ' ', all)
-        all = re.sub(r'\{\{.*?\}\}', r'', all)
-        all = re.sub(r'\[\[Category:.*', '', all)
-        all = re.sub(r'==\s*[Ss]ource\s*==.*', '', all)
-        all = re.sub(r'==\s*[Rr]eferences\s*==.*', '', all)
-        all = re.sub(r'==\s*[Ee]xternal [Ll]inks\s*==.*', '', all)
-        all = re.sub(r'==\s*[Ee]xternal [Ll]inks and [Rr]eferences==\s*', '', all)
-        all = re.sub(r'==\s*[Ss]ee [Aa]lso\s*==.*', '', all)
-        all = re.sub(r'http://[^\s]*', '', all)
-        all = re.sub(r'\[\[Image:.*?\]\]', '', all)
-        all = re.sub(r'Image:.*?\|', '', all)
-        all = re.sub(r'\[\[.*?\|*([^\|]*?)\]\]', r'\1', all)
-        all = re.sub(r'\&lt;.*?&gt;', '', all)
-        """
     except:
         # Something went wrong, try again. (This is bad coding practice.)
         print 'oops. there was a failure parsing %s.' \
@@ -74,7 +59,10 @@ def make_topic_dataset_pickle(src_dir, target_file):
             
             new_text = clean_plaintext_article(orig_text, True)
             topic_headings = re.findall(r'&lt;h[23]&gt;.*?&lt;/h[23]&gt;', new_text)
+            topic_headings = [re.sub(r'&lt;h[23]&gt; ', '', h) for h in topic_headings]
             topic_headings = [re.sub(r'&lt;/?h[23]&gt;', '', h) for h in topic_headings]
+            topic_headings = [re.sub(r'&lt;.*?&gt;', '', h) for h in topic_headings]
+            topic_headings = [re.sub(r'&[^;\s]*?;', '', h) for h in topic_headings]
             topic_struct[subdir][filename] = topic_headings
     pickle.dump(topic_struct, open(target_file, 'w'))
     return topic_struct
