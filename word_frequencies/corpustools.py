@@ -21,29 +21,21 @@ WORDS_IN_ENGLISH = 230000
 
 def corpus_from_textfile(filename):
 	# Make a corpus of text that's not built into NLTK.
-	
-	'''
-	# This is one way:
-	file_contents = open(filename).read()
-	words = []
-	for snt in nltk.sent_tokenize(file_contents):
-		# Tokenize sentences before words, otherwise last word in each sentence
-		# ends with a period.
-		words.extend( nltk.word_tokenize(snt) )
-		
-	plut_corpus = nltk.Text(words)
-	'''
-	
-	# This is another way:
-	corpus_root = '.'
+	corpus_root = "./"
 	corpus_reader = PlaintextCorpusReader(corpus_root, filename)
+	return corpus_reader
+
+
+def corpus_from_directory(path):
+	# Make a corpus of all text files in a given directory
+	corpus_reader = PlaintextCorpusReader(path, ".*")
 	return corpus_reader
 
 
 def unigram_prob_dist(corpus):
 	'''
 	Compute unigram probability distributions from given corpus.
-	WittenBell provides smoothing compated to no. of words in English,
+	WittenBell provides smoothing compared to no. of words in English,
 	preventing probabilities of zero.
 	'''
 	freqs = corpus.vocab()
