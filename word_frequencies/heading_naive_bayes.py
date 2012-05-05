@@ -10,24 +10,20 @@ from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
 
             
-def evaluate(filename):
+def evaluate(filename, topics_list=['Transport biographies',\
+           'Biology biographies', 'Physics and astronomy biographies',\
+           'Law biographies'], exclude=True):
     """Test the accuracy for the results in the target file."""
-    golden_data = load_golden_data(filename)
-    
     num_times_to_repeat = 1
     
     correct = 0
     total = 0
     for i in range(num_times_to_repeat):
-        random.shuffle(golden_data)
+        training_data, test_data = load_data(filename, 20, topics_list, exclude)
         
-        num_total = len(golden_data)
-        num_train = (num_total*2)/3
-        num_test = num_total - num_train
+        classifier = BiographyClassifier(training_data, feature_extractor)
         
-        classifier = BiographyClassifier(golden_data[:num_train], feature_extractor)
-        
-        for (section_headings, bio_type) in golden_data[num_train:]:
+        for (section_headings, bio_type) in test_data:
             total += 1
             print classifier.classify(section_headings), ", ", bio_type
             if classifier.classify(section_headings) == bio_type:
@@ -35,19 +31,26 @@ def evaluate(filename):
 
     print "Average results over " + str(num_times_to_repeat) + " runs:" + str(float(correct)/total)
           
-def load_golden_data(filename):
+def load_data(filename, num_train_per_cat, topics_list=[], exclude_topics_in_list=True):
     """Get the training data from the target file with pickle."""
     f = open(filename, 'r')
     topic_struct = pickle.load(f)
     
     # data is formatted as dict<'biography_type', dict<'article_name', list<'section_heading'>>>
     # want to format as list<(list<'section_headings'>, 'biography_type')>
-    golden_data = list()
+    training_data = list()
+    test_data = list()
     for bio_type, articles in topic_struct.items():
-        for article_name, section_headings in articles.items():
-            tup = (section_headings, bio_type)
-            golden_data.append(tup)
-    return golden_data
+        if ((exclude_topics_in_list and (bio_type not in topics_list)) or \
+               ((not exclude_topics_in_list) and (bio_type in topics_list))):
+            article_list = articles.items()
+            random.shuffle(article_list)
+            
+            for article_name, section_headings in article_list[:num_train_per_cat]:
+                training_data.append((section_headings, bio_type))
+            for article_name, section_headings in article_list[num_train_per_cat:]:
+                test_data.append((section_headings, bio_type))
+    return training_data, test_data
         
 class BiographyClassifier():
     """Naive bayesian classifier that takes a list of section headings and
@@ -72,6 +75,7 @@ def feature_extractor(section_headings):
     lmtzr = WordNetLemmatizer()
     for heading in section_headings:
         features['heading_' + heading] = True
+        features['heading_lower_' + heading.lower()] = True
         words = re.findall(r'\w+', heading, flags = re.UNICODE)
         for word in words:
             if word.lower() not in stopwords.words('english'):
