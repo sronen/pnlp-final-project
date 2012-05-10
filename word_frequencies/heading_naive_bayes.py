@@ -25,9 +25,11 @@ def evaluate(filename, topics_list=['Transport biographies',\
         
         for (section_headings, bio_type) in test_data:
             total += 1
-            print classifier.classify(section_headings), ", ", bio_type
+
             if classifier.classify(section_headings) == bio_type:
                 correct += 1
+            else:
+                print "Misclassified", bio_type, "as", classifier.classify(section_headings)
 
     print "Average results over " + str(num_times_to_repeat) + " runs:" + str(float(correct)/total)
           
@@ -83,5 +85,8 @@ def feature_extractor(section_headings):
                 features[word.lower()] = True
                 features[lmtzr.lemmatize(word).lower()] = True
     return features
+    
+if __name__ == '__main__':
+    evaluate('../datasets/topics_pickle')
 
     
