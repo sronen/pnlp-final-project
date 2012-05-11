@@ -12,13 +12,12 @@ from nltk.stem.wordnet import WordNetLemmatizer
             
 def evaluate(filename, topics_list=['Transport biographies',\
            'Biology biographies', 'Physics and astronomy biographies',\
-           'Law biographies'], exclude=True):
+           'Law biographies'], exclude=True, repeat=1):
     """Test the accuracy for the results in the target file."""
-    num_times_to_repeat = 10
     
     correct = 0
     total = 0
-    for i in range(num_times_to_repeat):
+    for i in range(repeat):
         training_data, test_data = load_data(filename, 20, topics_list, exclude)
         
         classifier = BiographyClassifier(training_data, feature_extractor)
@@ -32,7 +31,8 @@ def evaluate(filename, topics_list=['Transport biographies',\
                 pass
                 #print "Misclassified", bio_type, "as", classifier.classify(section_headings)
 
-    print "Average results over " + str(num_times_to_repeat) + " runs:" + str(float(correct)/total)
+    print "Average results over " + str(repeat) + " runs:" + str(float(correct)/total)
+    classifier.classifier.show_most_informative_features(50)
           
 def load_data(filename, num_train_per_cat, topics_list=[], exclude_topics_in_list=True):
     """Get the training data from the target file with pickle."""
@@ -76,9 +76,11 @@ def feature_extractor(section_headings):
     """Extract features from a relation for the classifier."""
     features = dict()
     lmtzr = WordNetLemmatizer()
-    for heading in section_headings:
+    for position_in_headings, heading in enumerate(section_headings):
+        num_headings = len(section_headings)
         features['heading_' + heading] = True
         features['heading_lower_' + heading.lower()] = True
+        features['heading_pos_' + heading] = position_in_headings
         words = re.findall(r'\w+', heading, flags = re.UNICODE)
         for word in words:
             if word.lower() not in stopwords.words('english'):
@@ -88,6 +90,9 @@ def feature_extractor(section_headings):
     return features
     
 if __name__ == '__main__':
-    evaluate('../datasets/topics_pickle')
+    try:
+        evaluate('../datasets/topics_pickle', repeat=sys.argv[1])
+    except IndexError:
+	    evaluate('../datasets/topics_pickle', repeat=1)
 
     
