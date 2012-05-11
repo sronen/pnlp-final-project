@@ -14,7 +14,7 @@ def evaluate(filename, topics_list=['Transport biographies',\
            'Biology biographies', 'Physics and astronomy biographies',\
            'Law biographies'], exclude=True):
     """Test the accuracy for the results in the target file."""
-    num_times_to_repeat = 1
+    num_times_to_repeat = 10
     
     correct = 0
     total = 0
@@ -29,7 +29,8 @@ def evaluate(filename, topics_list=['Transport biographies',\
             if classifier.classify(section_headings) == bio_type:
                 correct += 1
             else:
-                print "Misclassified", bio_type, "as", classifier.classify(section_headings)
+                pass
+                #print "Misclassified", bio_type, "as", classifier.classify(section_headings)
 
     print "Average results over " + str(num_times_to_repeat) + " runs:" + str(float(correct)/total)
           
