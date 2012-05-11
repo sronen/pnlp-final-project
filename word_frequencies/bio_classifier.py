@@ -97,7 +97,6 @@ def infobox_feature_extractor(data):
     features = dict()
     lmtzr = WordNetLemmatizer()
     section_headings, infobox_features = data
-    # add in word splits...
     for feature in infobox_features:
         words = nltk.word_tokenize(feature)
         for word in words:
