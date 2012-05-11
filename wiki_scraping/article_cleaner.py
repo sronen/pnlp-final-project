@@ -52,18 +52,19 @@ def make_topic_dataset(src_dir):
     listing = os.listdir(src_dir)
     topic_struct = dict()
     for subdir in listing:
-        topic_struct[subdir] = dict()
-        files = os.listdir(src_dir + '/' + subdir)
-        for filename in files:
-            orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
-            
-            new_text = clean_plaintext_article(orig_text, True)
-            topic_headings = re.findall(r'&lt;h[23]&gt;.*?&lt;/h[23]&gt;', new_text)
-            topic_headings = [re.sub(r'&lt;h[23]&gt; ', '', h) for h in topic_headings]
-            topic_headings = [re.sub(r'&lt;/?h[23]&gt;', '', h) for h in topic_headings]
-            topic_headings = [re.sub(r'&lt;.*?&gt;', '', h) for h in topic_headings]
-            topic_headings = [re.sub(r'&[^;\s]*?;', '', h) for h in topic_headings]
-            topic_struct[subdir][filename] = topic_headings
+        if os.path.isdir(src_dir + '/' + subdir):
+            topic_struct[subdir] = dict()
+            files = os.listdir(src_dir + '/' + subdir)
+            for filename in files:
+                orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
+                
+                new_text = clean_plaintext_article(orig_text, True)
+                topic_headings = re.findall(r'&lt;h[23]&gt;.*?&lt;/h[23]&gt;', new_text)
+                topic_headings = [re.sub(r'&lt;h[23]&gt; ', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&lt;/?h[23]&gt;', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&lt;.*?&gt;', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&[^;\s]*?;', '', h) for h in topic_headings]
+                topic_struct[subdir][filename] = topic_headings
     return topic_struct
     
 def make_infobox_dataset(src_dir):
@@ -72,48 +73,62 @@ def make_infobox_dataset(src_dir):
     infobox_struct = dict()
     
     for subdir in listing:
-        infobox_struct[subdir] = dict()
-        files = os.listdir(src_dir + '/' + subdir)
-        for filename in files:
-            orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
-            
-            infobox_features = []
-            infobox = False
-            ignore = 0
-            for line in orig_text.splitlines():
-                if not infobox:
-                    match = re.search(r'{{Infobox',line)
-                    if match:
-                        infobox = True
-                        infobox_features.append(match.string[10:])
-                if infobox:
-                    print line
-                    # extract the features from the line
-                    if len(line) > 1 and line[0] == '|':
-                        match = re.search(r'\s?.*?\s*?=', line[1:])
+        if os.path.isdir(src_dir + '/' + subdir):
+            infobox_struct[subdir] = dict()
+            files = os.listdir(src_dir + '/' + subdir)
+            for filename in files:
+                orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
+                
+                infobox_features = []
+                infobox = False
+                ignore = 0
+                for line in orig_text.splitlines():
+                    if not infobox:
+                        match = re.search(r'{{Infobox',line)
                         if match:
-                            feature_name = re.sub(r'=.*', "", match.string)
-                            infobox_features.append(feature_name)
-                    
-                    # ignore enclosed multiline double-braces
-                    if re.search(r'{{',line) and not re.search(r'{{Infobox',line):
-                        ignore += 1
-                    if re.search(r'}}',line):
-                        if not re.search(r'{{',line):
-                            if not ignore:
-                                break 
-                        # ignore enclosed single-line double-braces
-                        ignore -= 1
-            if len(infobox_features) > 0:
+                            infobox = True
+                            infobox_features.append(match.string[10:])
+                    if infobox:
+                        # extract the features from the line
+                        if len(line) > 0 and re.search(r'^\s*?\|', line):
+                            match = re.search(r'^\s*?|\s?.*?\s*?=', line)
+                            if match:
+                                feature_name = re.sub(r'^\s*?\|\s?', "", match.string)
+                                feature_name = re.sub(r'^\s*', "", feature_name)
+                                feature_name = re.sub(r'=.*', "", feature_name)
+                                feature_name = re.sub(r'\s*$', "", feature_name)
+                                infobox_features.append(feature_name)
+                        
+                        # ignore enclosed multiline double-braces
+                        if re.search(r'{{',line) and not re.search(r'{{Infobox',line):
+                            ignore += 1
+                        if re.search(r'}}',line):
+                            if not re.search(r'{{',line):
+                                if not ignore:
+                                    break 
+                            # ignore enclosed single-line double-braces
+                            ignore -= 1
                 infobox_struct[subdir][filename] = infobox_features
-    return make_infobox_dataset
+    return infobox_struct
     
 def make_combined_dataset_pickle(raw_dir, clean_dir, target_file):
     """Take in a raw dir and a cleaned dir, and generate a combined pickle file
     that contains both infobox data and topic data."""
     infobox_struct = make_infobox_dataset(raw_dir)
     topic_struct = make_topic_dataset(clean_dir)
+    combined_struct = dict()
     
+    for bio_type, articles in topic_struct.items():
+        combined_struct[bio_type] = dict()
+        article_list = articles.items()
+        for article_name, section_headings in article_list:
+            if article_name in infobox_struct[bio_type]:
+                infobox = infobox_struct[bio_type][article_name]
+            else:
+                infobox = []
+            combined_struct[bio_type][article_name] = (section_headings, infobox)
+    pickle.dump(combined_struct, open(target_file, 'w'))
+    return combined_struct
                 
 if __name__=='__main__':
     if (len(sys.argv) < 3) or (not os.path.exists(sys.argv[1])):

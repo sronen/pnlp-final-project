@@ -10,50 +10,70 @@ from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
 
             
-def evaluate(filename, topics_list=['Transport biographies',\
-           'Biology biographies', 'Physics and astronomy biographies',\
-           'Law biographies'], exclude=True, repeat=1):
+def evaluate(filename, repeat=1, num_train_per_cat=20):
     """Test the accuracy for the results in the target file."""
+    boosting_correct = 0
+    all_total = 0
     
-    correct = 0
-    total = 0
+    full_both_correct = 0
+    both_correct = 0
+    infobox_total = 0
+    
     for i in range(repeat):
-        training_data, test_data = load_data(filename, 20, topics_list, exclude)
+        infobox_training_data, infobox_test_data, full_training_data, full_test_data = load_data(filename, num_train_per_cat)
         
-        classifier = BiographyClassifier(training_data, feature_extractor)
+        headings_classifier = BiographyClassifier(full_training_data, heading_feature_extractor)
+        both_classifier = BiographyClassifier(infobox_training_data, full_feature_extractor)
         
-        for (section_headings, bio_type) in test_data:
-            total += 1
-
-            if classifier.classify(section_headings) == bio_type:
-                correct += 1
+        # could experiment with boosting?
+        for (data, bio_type) in full_test_data:
+            all_total += 1
+            if both_classifier.classify(data) == bio_type:
+                full_both_correct += 1
+                
+            if len(data[1]) > 0:
+                infobox_total += 1
+                if both_classifier.classify(data) == bio_type:
+                    both_correct += 1
+                    boosting_correct += 1
             else:
-                pass
-                #print "Misclassified", bio_type, "as", classifier.classify(section_headings)
+                if headings_classifier.classify(data) == bio_type:
+                    boosting_correct += 1
 
-    print "Average results over " + str(repeat) + " runs:" + str(float(correct)/total)
-    classifier.classifier.show_most_informative_features(50)
-          
-def load_data(filename, num_train_per_cat, topics_list=[], exclude_topics_in_list=True):
-    """Get the training data from the target file with pickle."""
+    print "Boosting classifier on all data, results over " + str(repeat) + " runs: " + str(float(boosting_correct)/all_total)
+    print "Full classifier on all data, results over " + str(repeat) + " runs: " + str(float(full_both_correct)/all_total)
+    print "Full classifier on infobox data, results over " + str(repeat) + " runs: " + str(float(both_correct)/infobox_total)
+
+    headings_classifier.classifier.show_most_informative_features(50)
+    both_classifier.classifier.show_most_informative_features(50)
+    
+def load_data(filename, num_train_per_cat):
+    """Get the training data from the target file with pickle.
+    Infobox data is the data for only bios with infoboxes.
+    Full data is the data for all bios."""
+    
     f = open(filename, 'r')
     topic_struct = pickle.load(f)
     
-    # data is formatted as dict<'biography_type', dict<'article_name', list<'section_heading'>>>
-    # want to format as list<(list<'section_headings'>, 'biography_type')>
-    training_data = list()
-    test_data = list()
+    # data is formatted as dict<'biography_type', dict<'article_name', (list<'section_heading'>, list<'infobox_feature'>)>>
+    # want to format as list<((list<'section_headings'>, list<'infobox_feature'>)'biography_type')>
+    infobox_training_data = list()
+    full_training_data = list()
+    infobox_test_data = list()
+    full_test_data = list()
     for bio_type, articles in topic_struct.items():
-        if ((exclude_topics_in_list and (bio_type not in topics_list)) or \
-               ((not exclude_topics_in_list) and (bio_type in topics_list))):
-            article_list = articles.items()
-            random.shuffle(article_list)
-            
-            for article_name, section_headings in article_list[:num_train_per_cat]:
-                training_data.append((section_headings, bio_type))
-            for article_name, section_headings in article_list[num_train_per_cat:]:
-                test_data.append((section_headings, bio_type))
-    return training_data, test_data
+        article_list = articles.items()
+        random.shuffle(article_list)
+        
+        for article_name, data in article_list[:num_train_per_cat]:
+            if len(data[1]) > 0: #only if has infobox info
+                infobox_training_data.append((data, bio_type))
+            full_training_data.append((data, bio_type))
+        for article_name, data in article_list[num_train_per_cat:]:
+            if len(data[1]) > 0: #only if has infobox info
+                infobox_test_data.append((data, bio_type))
+            full_test_data.append((data, bio_type))
+    return infobox_training_data, infobox_test_data, full_training_data, full_test_data
         
 class BiographyClassifier():
     """Naive bayesian classifier that takes a list of section headings and
@@ -72,10 +92,24 @@ class BiographyClassifier():
         featureset = self.feature_extractor(section_headings)
         return self.classifier.classify(featureset)
     
-def feature_extractor(section_headings):
+def infobox_feature_extractor(data):
     """Extract features from a relation for the classifier."""
     features = dict()
     lmtzr = WordNetLemmatizer()
+    section_headings, infobox_features = data
+    # add in word splits...
+    for feature in infobox_features:
+        words = nltk.word_tokenize(feature)
+        for word in words:
+            features['infobox_word_' + word] = True
+        features['infobox_' + feature] = True
+    return features
+    
+def heading_feature_extractor(data):
+    """Extract features from a relation for the classifier."""
+    features = dict()
+    lmtzr = WordNetLemmatizer()
+    section_headings, infobox_features = data
     for position_in_headings, heading in enumerate(section_headings):
         num_headings = len(section_headings)
         features['heading_' + heading] = True
@@ -89,10 +123,16 @@ def feature_extractor(section_headings):
                 features[lmtzr.lemmatize(word).lower()] = True
     return features
     
+def full_feature_extractor(data):
+    features = infobox_feature_extractor(data) 
+    for k, v in heading_feature_extractor(data).items():
+        features[k] = v
+    return features
+    
 if __name__ == '__main__':
     try:
-        evaluate('../datasets/topics_pickle', repeat=sys.argv[1])
+        evaluate('../datasets/classifier_data.pkl', repeat=sys.argv[1])
     except IndexError:
-	    evaluate('../datasets/topics_pickle', repeat=1)
+	    evaluate('../datasets/classifier_data.pkl', repeat=1)
 
     
