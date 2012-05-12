@@ -11,12 +11,15 @@ def get_article_other_languages(site, article_name, max_results=500):
 	The default number for max results, 500, is the maximum value for llimit.
 	
 	Example: http://en.wikipedia.org/w/api.php?action=query&prop=langlinks&titles=Pizza&lllimit=500&redirects=
+	
+	TODO: implemet query for multiple people by receiving a list and 
+	passing its items as |-delimited text to titles! 
 	'''
 	
 	params = {'action':'query', 'prop':'langlinks', 'titles':article_name, \
 	'lllimit':max_results, 'redirect':''}
 	
-	req = api.APIRequest(site_en, params)
+	req = api.APIRequest(site, params)
 	res = req.query(querycontinue=False) # item from which the query continues
 	
 	# 'res' is a big messy nested dictionary. The first tuple on 'pages' holds 
