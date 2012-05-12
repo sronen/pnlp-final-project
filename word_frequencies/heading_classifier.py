@@ -31,6 +31,17 @@ def evaluate(filename, repeat=1, num_train_per_cat=20):
     classifier.classifier.show_most_informative_features(50)
     return classifier
     
+def get_classifier(filename):
+    training_data, test_data = load_data(filename, 999999)
+    classifier = HeadingClassifier(training_data, feature_extractor)
+    # do classifier.classifier.prob('Warfare biographies') to get the probability
+    # that this heading is from warfare biographies.
+    # To get a histogram for a given heading name:
+    # probdist = classifier.classifer.prob_classify(classifier.feature_extractor('Background and family')
+    # print zip(a.samples(), [a.prob(h) for h in a.samples()])
+    return classifier
+    
+    
 def load_data(filename, num_train_per_cat):
     """Get the training data from the target file with pickle.
     Infobox data is the data for only bios with infoboxes.
