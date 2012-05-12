@@ -23,13 +23,14 @@ def corpus_from_textfile(filename):
 	# Make a corpus of text that's not built into NLTK.
 	corpus_root = "./"
 	corpus_reader = PlaintextCorpusReader(corpus_root, filename)
-	return corpus_reader
+	return nltk.Text(corpus_reader.words())
 
+#path = '../datasets/cleaned_featured_bios/Biology biographies/'
 
 def corpus_from_directory(path):
 	# Make a corpus of all text files in a given directory
 	corpus_reader = PlaintextCorpusReader(path, ".*")
-	return corpus_reader
+	return nltk.Text( corpus_reader.words() )
 
 
 def unigram_prob_dist(corpus):
@@ -63,7 +64,7 @@ def prob_ratios(probs1, probs2, top_tokens=50):
 		sorted(prob_ratio, key=prob_ratio.get,reverse=True)[:top_tokens] ]
 
 
-def bigram_pointwise_mutual_info(corpus_reader, top_tokens=50):
+def bigram_pointwise_mutual_info(corpus, top_tokens=50):
 	'''
 	Build a probability distribution for bigrams of words in your corpus, 
 	and return the top top_tokens bigrams with the most pointwise mutual information compared 
@@ -74,14 +75,11 @@ def bigram_pointwise_mutual_info(corpus_reader, top_tokens=50):
 		# Calculate pointwise mutual information for given probabilities
 		return log( p_w1w2/(p_w1*p_w2) )
 	
-	# Generate Corpus from Reader
-	corpus = nltk.Text( corpus_reader.words() )
-	
 	# Calculate probability of unigrams
 	probs_unigrams = unigram_prob_dist(corpus)
 	
 	# Calculate probability of bigrams
-	bigrams = nltk.bigrams(corpus_reader.words())
+	bigrams = nltk.bigrams(corpus.tokens)
 	freq_bigrams = FreqDist(bigrams)
 	prob_bigrams = nltk.MLEProbDist(freq_bigrams)
 	
@@ -142,8 +140,7 @@ if __name__ == "__main__":
 		exit()
 	
 	# Create the new corpus and compute prob. dist.
-	new_corpus_reader = corpus_from_textfile(textfilename)
-	new_corpus = nltk.Text( new_corpus_reader.words() )
+	new_corpus = corpus_from_textfile(textfilename)
 	print "created corpus from", textfilename, ":", new_corpus
 	new_prob = unigram_prob_dist(new_corpus)
 	
@@ -153,12 +150,12 @@ if __name__ == "__main__":
 	
 	# Get top 50 probablity ratios for the corpora 
 	prob_ratios_50 = prob_ratios(new_prob, brn_prob, top_tokens=50)
-	#print "Top 50 ratios (New corpus to Brown):", prob_ratios_50
+	print "Top 50 ratios (New corpus to Brown):", prob_ratios_50
 	
 	# Find the top 50 bigrams with the most pointwise mutual information
 	# compared to the unigrams in your corpus. Note we use CorpusReader!
-	pmis_50 = bigram_pointwise_mutual_info(new_corpus_reader, top_tokens=50)
-	#print "Top 50 PMIs in new corpus", pmis_50
+	pmis_50 = bigram_pointwise_mutual_info(new_corpus, top_tokens=50)
+	print "Top 50 PMIs in new corpus", pmis_50
 	
 	# Generate some random text based on probability distribution of corpus
 	# Show examples for n-grams with n=1 through 5.
