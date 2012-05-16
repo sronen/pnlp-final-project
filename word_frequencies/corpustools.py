@@ -13,23 +13,26 @@ from nltk.corpus import PlaintextCorpusReader
 from collections import defaultdict
 from math import log
 from markov_start import *
+import os
 
 WORDS_IN_ENGLISH = 230000
 # Based on:
 # http://oxforddictionaries.com/words/how-many-words-are-there-in-the-english-language
 
 
-def corpus_from_textfile(filename):
+def corpus_from_files(filenames):
 	# Make a corpus of text that's not built into NLTK.
 	corpus_root = "./"
-	corpus_reader = PlaintextCorpusReader(corpus_root, filename)
+	corpus_reader = PlaintextCorpusReader(corpus_root, filenames)
 	return nltk.Text(corpus_reader.words())
 
-#path = '../datasets/cleaned_featured_bios/Biology biographies/'
 
-def corpus_from_directory(path):
-	# Make a corpus of all text files in a given directory
-	corpus_reader = PlaintextCorpusReader(path, ".*")
+def corpus_from_directory(path, filetype='.*'):
+	'''
+	Make a corpus of all files in a given directory. Can limit type by passing
+	the desired extension, proper format is, e.g., '.*\.txt'
+	'''
+	corpus_reader = PlaintextCorpusReader(path, filetype)
 	return nltk.Text( corpus_reader.words() )
 
 
