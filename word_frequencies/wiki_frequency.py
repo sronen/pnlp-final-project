@@ -76,45 +76,8 @@ def get_category_names(root_path):
 	for folder in os.listdir(root_path):
 		if folder[0] not in ['.', '_']:
 			categories.append(folder)
-		
+			
 	return categories
-
-
-
-def calculate_corpus_tf_idf(pos_clean_root):
-	'''
-	Calculate TF*IDF weight for each document in given corpus.
-	-Return:
-	 (1) A dictionary whose keys=document name and values=dictionary
-	 with terms for keys and TF*IDF weights for values
-	 (2) A dictionary whose keys=terms and values=their IDF
-	'''
-	st_time = time.time()
-	
-	# Read the tagged corpus
-	whole_corpus = TaggedCorpusReader(pos_clean_root, '.*\.pos.clean')
-	
-	# Term Frequency for each category
-	tfs_per_document = defaultdict(Counter)
-	for document in whole_corpus.fileids():
-		terms_in_document = whole_corpus.words(document)
-		tfs_per_document[document] = tf_idf.tf(terms_in_document)
-	
-	# Inverse Document Frequency
-	idfs = tf_idf.idf(tfs_per_document)
-		
-	# key is folder name, value is a list of (term, tfidf score) pairs
-	tfidfs_per_document = defaultdict(defaultdict) 
-	for document, tfs in tfs_per_document.iteritems():
-	    tfidfs_per_document[document] = tf_idf.tf_idf(tfs, idfs, len(tfs_per_document))
-	
-	for document, values in tfidfs_per_document.iteritems():
-		print document
-		print top_n_terms(values, 20)
-		print
-		
-	print "time to compute:", time.time()-st_time
-	return tfidfs_per_document, idfs
 
 
 def print_top_terms(tfidfs, num=20):
@@ -217,6 +180,42 @@ def clean_tag_wiki_corpus(root_path):
 			clean_root_path+category+".clean")
 			
 	return clean_tagged_words
+
+
+def calculate_corpus_tf_idf(pos_clean_root):
+	'''
+	Calculate TF*IDF weight for each document in given corpus.
+	-Return:
+	 (1) A dictionary whose keys=document name and values=dictionary
+	 with terms for keys and TF*IDF weights for values
+	 (2) A dictionary whose keys=terms and values=their IDF
+	'''
+	st_time = time.time()
+	
+	# Read the tagged corpus
+	whole_corpus = TaggedCorpusReader(pos_clean_root, '.*\.pos.clean')
+	
+	# Term Frequency for each category
+	tfs_per_document = defaultdict(Counter)
+	for document in whole_corpus.fileids():
+		terms_in_document = whole_corpus.words(document)
+		tfs_per_document[document] = tf_idf.tf(terms_in_document)
+		
+	# Inverse Document Frequency
+	idfs = tf_idf.idf(tfs_per_document)
+	
+	# key is folder name, value is a list of (term, tfidf score) pairs
+	tfidfs_per_document = defaultdict(defaultdict) 
+	for document, tfs in tfs_per_document.iteritems():
+	    tfidfs_per_document[document] = tf_idf.tf_idf(tfs, idfs, len(tfs_per_document))
+		
+	for document, values in tfidfs_per_document.iteritems():
+		print document
+		print top_n_terms(values, 20)
+		print
+		
+	print "time to compute:", time.time()-st_time
+	return tfidfs_per_document, idfs
 
 
 def classify_article_tfidf(article, corpus_tfidfs_per_category, corpus_idf):
