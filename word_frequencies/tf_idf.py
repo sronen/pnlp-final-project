@@ -1,3 +1,8 @@
+'''
+ Inspired by DataIAP 2012 by Adam Marcus and Eugene Wu
+ https://github.com/dataiap/dataiap/tree/master/day4/get_terms.py
+'''
+
 import math
 from collections import Counter, defaultdict
 
