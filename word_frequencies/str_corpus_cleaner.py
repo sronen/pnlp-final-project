@@ -22,6 +22,8 @@ def get_clean_terms(s):
 	https://github.com/dataiap/dataiap/tree/master/day4/get_terms.py
 	'''
 	
+	# TODO: remove capitalized words not at the beginning of a sentence?
+	
 	s = s.lower()
 	terms = s.split()
 	
