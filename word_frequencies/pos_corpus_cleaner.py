@@ -1,8 +1,8 @@
-import nltk
 import os, codecs
-import operator, operator
+import operator
 import corpustools as ct
-import get_terms
+import nltk
+from nltk.corpus import stopwords
 
 def tag_pos_corpus(corpus_to_tag):
 	'''
@@ -60,22 +60,6 @@ def get_category_names(root_path):
 			categories.append(folder)
 			
 	return categories
-
-
-def print_top_terms(tfidfs, num=20):
-	for folder, terms in tfidfs.iteritems():
-	    print folder
-	    sorted_by_count_top = sorted(terms, key=lambda (k,v): v, reverse=True)[:num]
-	    for pair in sorted_by_count_top:
-	        print '\t', pair
-
-
-def top_n_terms(freqdist, n):
-	#sorted_by_count_top = sorted(freqdist, key=lambda (k,v): v, reverse=True)[:n]
-	
-	top_items = sorted(freqdist.items(), key=operator.itemgetter(1), reverse=True)[:n]
-	
-	return top_items
 
 
 def clean_pos(tagged_words_to_clean):
