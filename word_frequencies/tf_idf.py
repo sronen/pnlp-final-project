@@ -68,6 +68,6 @@ def tf_idf(tfs, idfs, documents_in_corpus):
 			# IDF would be log( # of documents in corpus), see
 			# http://en.wikipedia.org/wiki/Tf-idf#Mathematical_details
 			tfidfs[term] = math.log(documents_in_corpus)
-			print "Term not in corpus: %s" % term
+			# print "Term not in corpus: %s" % term # debug
 		
 	return tfidfs
