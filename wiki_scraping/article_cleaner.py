@@ -1,6 +1,6 @@
 import sys, re, string, time, os, pickle
 
-def clean_plaintext_article(text, extract_topics=False):
+def clean_plaintext_article(text, extract=False):
     """As input, takes the plain text from a wikipedia article that we got from
     the Wikipedia API's extract field, which isn't quite plain text, and removes the
     remaining HTML tags."""
@@ -14,7 +14,7 @@ def clean_plaintext_article(text, extract_topics=False):
         text = re.sub(r'&lt;h2&gt;\s*[Rr]eferences\s*&lt;/h2&gt;.*', '', text, flags=re.DOTALL)
         text = re.sub(r'&lt;h2&gt;\s*[Ss]ee [Aa]lso\s*&lt;/h2&gt;.*', '', text, flags=re.DOTALL)
         text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
-        if extract_topics:
+        if extract:
             return text
         text = re.sub(r'&lt;.*?&gt;', '', text) # remove all html tags
         text = re.sub(r'&[^;\s]*?;', '', text) # remove all other markings, e.g. &quot;
@@ -66,6 +66,65 @@ def make_topic_dataset(src_dir):
                 topic_headings = [re.sub(r'&[^;\s]*?;', '', h) for h in topic_headings]
                 topic_struct[subdir][filename] = topic_headings
     return topic_struct
+    
+def make_paragraph_dataset(src_dir):
+    """Take in a dataset directory src_dir, which should have subdirectories that represent
+    categories, and files in those subdirectories that are plaintext wikipedia articles.
+    Clean those wikipedia articles return them."""
+    listing = os.listdir(src_dir)
+    paragraph_struct = dict()
+    for subdir in listing:
+        if os.path.isdir(src_dir + '/' + subdir):
+            paragraph_struct[subdir] = dict()
+            files = os.listdir(src_dir + '/' + subdir)
+            for filename in files:
+                orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
+                
+                new_text = clean_plaintext_article(orig_text, True)
+                lines = new_text.split("\n")
+                
+                current_h2 = 'Intro' # our artificial name for the heading at the start of the text
+                current_h3 = None
+                
+                paragraph_struct[subdir][filename] = list()
+                for line in lines:
+                    if len(line) == 0:
+                        continue
+                    heading_match = re.search(r'&lt;h[23]&gt;.*?&lt;/h[23]&gt;', line)
+                    if heading_match:
+                        heading = heading_match.string
+                        # find out if h2 or h3 before removing
+                        is_h2 = ';h2&' in heading
+                        heading = re.sub(r'&lt;h[23]&gt;', '', heading)
+                        heading = re.sub(r'&lt;/?h[23]&gt;', '', heading)
+                        heading = re.sub(r'&lt;.*?&gt;', '', heading)
+                        heading = re.sub(r'&[^;\s]*?;', '', heading)
+                        # update heading
+                        if is_h2:
+                            current_h2 = heading
+                            current_h3 = None
+                        else:
+                            current_h3 = heading
+                    paragraph_match = re.search(r'&lt;p&gt;.*?&lt;/p&gt;', line)
+                    if paragraph_match:
+                        paragraph = paragraph_match.string
+                        paragraph = re.sub(r'&lt;p&gt; ', '', paragraph)
+                        paragraph = re.sub(r'&lt;/p&gt;', '', paragraph)
+                        paragraph = re.sub(r'&lt;.*?&gt;', '', paragraph)
+                        paragraph = re.sub(r'&[^;\s]*?;', '', paragraph)
+                        # add to paragraph struct
+                        paragraph_struct[subdir][filename].append((current_h2, current_h3, paragraph))
+                        
+                """    
+                topic_headings = re.findall(r'&lt;h[23]&gt;.*?&lt;/h[23]&gt;', new_text)
+                topic_headings = [re.sub(r'&lt;h[23]&gt; ', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&lt;/?h[23]&gt;', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&lt;.*?&gt;', '', h) for h in topic_headings]
+                topic_headings = [re.sub(r'&[^;\s]*?;', '', h) for h in topic_headings]
+                paragraph_struct[subdir][filename] = topic_headings
+                """
+    return paragraph_struct
+    
     
 def make_infobox_dataset(src_dir):
     """Take in a raw dataset directory, and extract infobox data."""
