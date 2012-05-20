@@ -1,0 +1,100 @@
+Articles in training set:
+****************
+AC_DC.txt
+match: ('Music biographies.pos.clean', 0.09374518973703273)
+time to match: 8.59575891495
+
+Cillian Murphy
+match: ('Media biographies.pos.clean', 0.1786763700651984)
+time to match: 8.52683711052
+
+Tim_Duncan.txt
+match: ('Sport and recreation biographies.pos.clean', 0.1471234391739676)
+time to match: 10.2145290375
+
+Anton_Chekhov
+match: ('Literature and theatre biographies.pos.clean', 0.10877980835792687)
+time to match: 5.35647988319
+
+
+
+Not in training set:
+*******************
+
+Tiger_Woods.txt
+match: ('Sport and recreation biographies.pos.clean', 0.007792350533826141)
+time to match: 10.643789053
+
+Karl_Marx.txt
+match: ('Politics and government biographies.pos.clean', 0.00788282097913297)
+time to match: 13.281414032
+
+Agatha_Christie.txt
+match: ('Literature and theatre biographies.pos.clean', 0.008515814600930253)
+time to match: 9.37371301651
+
+Toni_Blair.txt
+match: ('Politics and government biographies.pos.clean', 0.0027160906052943077)
+time to match: 11.4231169224
+
+* * * *
+
+POS Tagging:
+Art, architecture and archaeology biographies.pos: 137.412671804
+
+../datasets/cleaned_featured_bios/History biographies
+Created corpus ../datasets/cleaned_featured_bios/History biographies, tagging...
+>>> Time to tag: 529.489235878
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/History biographies.pos
+
+../datasets/cleaned_featured_bios/Literature and theatre biographies
+Created corpus ../datasets/cleaned_featured_bios/Literature and theatre biographies, tagging...
+>>> Time to tag: 424.683156013
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Literature and theatre biographies.pos
+
+../datasets/cleaned_featured_bios/Media biographies
+Created corpus ../datasets/cleaned_featured_bios/Media biographies, tagging...
+>>> Time to tag: 240.83003211
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Media biographies.pos
+
+../datasets/cleaned_featured_bios/Music biographies
+Created corpus ../datasets/cleaned_featured_bios/Music biographies, tagging...
+>>> Time to tag: 719.117683172
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Music biographies.pos
+
+../datasets/cleaned_featured_bios/Politics and government biographies
+Created corpus ../datasets/cleaned_featured_bios/Politics and government biographies, tagging...
+>>> Time to tag: 634.305491209
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Politics and government biographies.pos
+
+../datasets/cleaned_featured_bios/Religion, mysticism and mythology biographies
+Created corpus ../datasets/cleaned_featured_bios/Religion, mysticism and mythology biographies, tagging...
+>>> Time to tag: 291.560039997
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Religion, mysticism and mythology biographies.pos
+
+../datasets/cleaned_featured_bios/Royalty, nobility and heraldry biographies
+Created corpus ../datasets/cleaned_featured_bios/Royalty, nobility and heraldry biographies, tagging...
+>>> Time to tag: 635.940628052
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Royalty, nobility and heraldry biographies.pos
+
+../datasets/cleaned_featured_bios/Sport and recreation biographies
+Created corpus ../datasets/cleaned_featured_bios/Sport and recreation biographies, tagging...
+>>> Time to tag: 906.850028992
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Sport and recreation biographies.pos
+
+../datasets/cleaned_featured_bios/Warfare biographies
+Created corpus ../datasets/cleaned_featured_bios/Warfare biographies, tagging...
+>>> Time to tag: 459.788060904
+>>> Created file ../datasets/cleaned_featured_bios/_pos_/Warfare biographies.pos
+
+Cleaning stats:
+Cleaning category Art, architecture and archaeology biographies.pos: 3.91393518448
+Cleaning category History biographies.pos: 15.3022739887
+Cleaning category Literature and theatre biographies.pos: 12.5675830841
+Cleaning category Media biographies.pos: 6.69839596748
+Cleaning category Music biographies.pos: 20.6417348385
+Cleaning category Politics and government biographies.pos: 18.9121191502
+Cleaning category Religion, mysticism and mythology biographies.pos: 8.40450906754
+Cleaning category Royalty, nobility and heraldry biographies.pos: 17.464195013
+Cleaning category Sport and recreation biographies.pos: 25.3523819447
+Cleaning category Warfare biographies.pos: 12.1467211246
