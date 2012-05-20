@@ -12,11 +12,11 @@ import nltk
 from nltk.corpus import CorpusReader
 
 import tf_idf
+import corpus_os
 import cosine_similarity as cosine_sim
 import str_corpus_cleaner, pos_corpus_cleaner
+import featured_article_downloader_presentation as get_wiki
 
-
-# TODO: split set to training and test, and evaluate. maybe 70:30 training:test?
 
 def calculate_corpus_tf_idf(corpus_reader):
 	'''
@@ -47,13 +47,14 @@ def calculate_corpus_tf_idf(corpus_reader):
 	return tfidfs_per_document, idfs
 
 
-def classify_article_tfidf(article_words, corpus_tfidfs_per_category, corpus_idf):
+def classify_article_words(article_words, corpus_tfidfs_per_category, corpus_idf):
 	'''
 	Find the category that best matches the given article among the given
 	categories.
 	-Input: (1) list of article terms (2) TF*IDF weights for each document in
 	 corpus (3) IDF for the entire corpus
-	-Return: a dictionary with match score for the article with each category
+	-Return: top category and a dictionary with match score for the article
+	 with each category
 	'''
 	st_time = time.time()
 	
@@ -62,16 +63,71 @@ def classify_article_tfidf(article_words, corpus_tfidfs_per_category, corpus_idf
 	article_tfidfs = tf_idf.tf_idf(article_tfs, corpus_idf, len(corpus_tfidfs_per_category))
 	
 	# find best match among categories
-	sim = defaultdict()
+	sim_scores = defaultdict()
 	for cat_name, cat_tfidf_scores in corpus_tfidfs_per_category.iteritems():
 		cos_sim_time = time.time()
-		sim[cat_name] = \
+		sim_scores[cat_name] = \
 			cosine_sim.cosine_similarity_dict(article_tfidfs, cat_tfidf_scores)
 		
 	# sort by value (match score), descending
-	match = sorted(sim.iteritems(), key=operator.itemgetter(1), reverse=True)[0]
+	match = sorted(sim_scores.iteritems(), key=operator.itemgetter(1), reverse=True)[0][0]
 	
-	return match, sim
+	return match, sim_scores
+
+
+def classify_article_file(article_path, tfidfs_per_doc, idfs):
+	'''
+	classify a single article.
+	-Return: matched category and similarity scores for all categories. 
+	'''
+	st_time = time.time()
+
+	ar_text = codecs.open(article_path, 'rU').read()
+	article_words = str_corpus_cleaner.get_clean_terms(ar_text)	
+
+	# Classify article
+	match, all_scores = classify_article_words( \
+		article_words, tfidfs_per_doc, idfs)
+	match = match.split('.')[0] # remove file extension, if any
+
+	#print "%s\t%s\t%.3e\t%.3f sec" % \
+	#	( article_path.split('/')[-1].replace('.txt',''), \
+	#	match[0], match[1], time.time()-st_time )
+
+	return match, all_scores
+
+
+def batch_classify_gold(root_path, tfidfs_per_doc, idfs):
+	'''
+	Classify all articles under the given categorized folder.
+	-Return: a dictionary whose keys=article names and values=tuple of
+	(suggested cateogry, real category, dict(similarity scores with categories)
+	for each article. 
+	'''
+	class_results = defaultdict(defaultdict)
+
+	for category_folder in corpus_os.get_items_in_folder(root_path):
+		# Get articles in directory
+		category_path = os.path.join(root_path, category_folder)
+		category_files = corpus_os.get_items_in_folder(category_path)
+
+		for article_file in category_files:
+			# Classify article
+			st_time = time.time()
+
+			article_path = os.path.join(category_path, article_file)
+			match, all_scores = \
+				classify_article_file(article_path, tfidfs_per_doc, idfs)
+
+			#print "%s\t%s\t%s\t(%.3e)\ttime: %.3f sec" % \
+			#	( article_path.split('/')[-1].replace('.txt',''), \
+			#	match, category_folder, match[1], \
+			#	time.time()-st_time )
+
+			class_results[article_file] = \
+			(match, category_folder, all_scores)
+
+	return class_results
 
 
 def print_top_terms(tfidfs, num=20):
@@ -80,6 +136,22 @@ def print_top_terms(tfidfs, num=20):
 		sorted_by_count_top = sorted(terms.iteritems(), key=operator.itemgetter(1), reverse=True)[:num]
 		for pair in sorted_by_count_top:
 			print '  ', pair
+
+
+def classifiy_wiki_article(search_str, tfidfs_per_doc, idfs):
+	'''
+	Get an article from Wikipedia and cllassify it against the provided data
+	TODO: not working...
+	'''
+	base_wiki = 'http://en.wikipedia.org/wiki/'
+	wiki_url = base_wiki+search_str.replace(' ', '_')
+
+	ar_text = \
+		get_wiki.get_specific_wikipedia_article(wiki_url, markup=False)
+	print ar_text	
+	article_words = str_corpus_cleaner.get_clean_terms(ar_text)
+
+	return classify_article_words(article_words, tfidfs_per_doc, idfs)
 
 
 if __name__ == "__main__":	
@@ -100,15 +172,13 @@ if __name__ == "__main__":
 	tfidfs_per_doc, idfs = calculate_corpus_tf_idf(training_corpus)
 	#print_top_terms(tfidfs_per_doc)
 	
-	# Initialize new article
-	ar_text = codecs.open(root_path+'/'+'Media biographies/Cillian_Murphy.txt', 'rU').read()
-	article_words = str_corpus_cleaner.get_clean_terms(ar_text)	
-	print "STR"
-	math, sim = classify_article_tfidf(article_words, tfidfs_per_doc, idfs)
-		
+	match, sim_score = classifiy_wiki_article(search_str, tfidfs_per_doc, idfs)
+	
+	'''
 	# Alternatively, use the POS cleaner
 	article_tagged = nltk.pos_tag(nltk.wordpunct_tokenize(ar_text))
 	article_taggged_clean = pos_corpus_cleaner.clean_pos(article_tagged)
 	article_words = [word for (word,pos) in article_taggged_clean]
 	print "POS"
-	match, sim = classify_article_tfidf(article_words, tfidfs_per_doc, idfs)
+	match, sim = classify_article_words(article_words, tfidfs_per_doc, idfs)
+	'''
