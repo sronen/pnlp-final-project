@@ -2,69 +2,20 @@ import os
 import nltk
 from nltk import metrics
 import wiki_frequency
-import str_corpus_cleaner, pos_corpus_cleaner
+import str_corpus_cleaner
 import time
-import codecs
-import corpus_os 
+import corpusus_os 
 
 from collections import defaultdict
 
-STR_TRAINING_ROOT = '../datasets/cleaned_featured_bios/_filtered_3_plus/'
-STR_TEST_ROOT = '../datasets/cleaned_featured_bios/_filtered_3_plus/'
-POS_CORPUS_ROOT = '../datasets/cleaned_featured_bios/_pos_clean_/'
-
-'''
-def str_corpus_tfidf(articles_to_classify):
-	#Calculate TF*IDF for a corpus cleaned using STREX, passed as list of article
-	#files.
-	# Initialize a plain-text corpus 
-	training_corpus = nltk.corpus.PlaintextCorpusReader( \
-		STR_TRAINING_ROOT, '.*\.txt')
-	
-	# Calculate TF*IDF for each category and IDF for the entrie corpus
-	tfidfs_per_doc, idfs = wiki_frequency.calculate_corpus_tf_idf(training_corpus)
-	print_top_terms(tfidfs_per_doc, 50)
-	
-	print "STR"
-	st_time = time.time()
-	
-	for article_path in articles_to_classify:
-		# Initialize new article
-		match, all_scores = classify_article(article_path, tfidfs_per_doc, idfs)
-			
-	return tfidfs_per_doc, idfs
-'''
-
-'''
-def pos_corpus_tfidf(articles_to_classify):
-	#Calculate TF*IDF for a corpus cleaned using POS, passed as list of article
-	#files.
-	# Use a POS-tagged corpus
-	training_corpus = nltk.corpus.TaggedCorpusReader( \
-		POS_CORPUS_ROOT, '.*\.pos.clean' )
-	
-	# Calculate TF*IDF for each category and IDF for the entrie corpus
-	tfidfs_per_doc, idfs = wiki_frequency.calculate_corpus_tf_idf(training_corpus)
-	
-	print "POS"
-	st_time = time.time()
-	
-	for article_path in articles_to_classify:
-		ar_text = codecs.open(article_path, 'rU').read()
-		article_tagged = nltk.pos_tag(nltk.wordpunct_tokenize(ar_text))
-		article_taggged_clean = pos_corpus_cleaner.clean_pos(article_tagged)
-		article_words = [word for (word,pos) in article_taggged_clean]
-		match, all_scores = wiki_frequency.classify_article_tfidf(article_words, tfidfs_per_doc, idfs)
-		match = match.split('.')[0]
-		
-		print "%s\t%s\t(%.3e)\ttime: %.3f sec" % \
-			( article_path.split('/')[-1].replace('.txt',''), \
-			match, match[1], time.time()-st_time )
-'''
-
 def eval_stats(results):
 	'''
-	Compute recall, precision, and f-measure from passed results
+	Compute recall, precision, and f-measure from passed results.
+	The expected format for results is a dictionary whose keys=<name of article>
+	and values=tuple (<test category>, <reference category>, <scores>), where:
+	test=category suggested by classifier, reference=pre-classified gold
+	category, scores=can be None or dictionary whose keys=category names and
+	values=matching score for this article.
 	'''
 	# Create sets of references / test classification for evaluation
 	cat_ref = defaultdict(set)
