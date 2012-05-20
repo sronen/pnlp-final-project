@@ -3,6 +3,7 @@
 import re
 import codecs
 import os, sys, time
+import corpus_os
 
 # These are the NLTK English stopwords
 STOPWORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'])
@@ -46,68 +47,75 @@ def get_clean_terms(s):
 	return terms
 
 
-def get_items_in_folder(root_path):
-	'''
-	Return a list of items (files and folders) in the passed folder, discarding
-	hidden files (starting with '.') and POS directories (starting with '_')
-	'''
-	PREFIXES_TO_DISCARD = ['.', '_']
-	
-	os.listdir(root_path)
-	sub_items = []
-	for item in os.listdir(root_path):
-		if item[0] not in PREFIXES_TO_DISCARD:
-			sub_items.append(item)
-			
-	return sub_items
-
-
-def create_category_file(root_path, category_name):
+def create_category_file(root_path, category_name, clean_root_path=None):
 	'''
 	Create a single file containing clean tokens for all documents in the 
 	passed folder. Assume the folder does not contain any sub-folders.
-	-Input: path of corpus root and name of category (=folder in corpus)
+	-Input: path of corpus root, name of category (=folder in corpus), and
+	 path for storing the clean files (default is root_path)
 	-Output: file named <categoty_name>.txt in the corpus root
 	-Return: number of documents processed.
-
 	'''
-	category_path = root_path+'/'+category_name
-	document_list = get_items_in_folder(category_path)
+	if clean_root_path==None:
+		clean_root_path=root_path
+	
+	category_path = os.path.join(root_path, category_name)
+	document_list = corpus_os.get_items_in_folder(category_path)
 	
 	folder_terms = []
 	
 	# Get all terms in folder (repetitions must be preserved!)
-	for num_docs, doc in enumerate(document_list):
-		fin = codecs.open(category_path+'/'+doc, 'rU')
+	for i, doc in enumerate(document_list):
+		fin = codecs.open(os.path.join(category_path, doc), 'rU')
 		doc_text = fin.read()
 		folder_terms.extend(get_clean_terms(doc_text))
 		# Add EOL to distinguish between text from different articles
 		folder_terms.append('\n')
+	
+	num_docs = i+1
 		
 	# Concatenate and write to file
 	folder_text_clean = ' '.join(folder_terms)
-	fout = codecs.open(category_path+'.txt', 'w')
+	
+	clean_file_path = os.path.join(clean_root_path, category_name+'.txt' )
+	fout = codecs.open(clean_file_path, 'w')
 	fout.write(folder_text_clean) # There's already an EOL at the end
 	fout.close()
 	
-	return num_docs+1
+	return num_docs
 
 
-def create_corpus_files(corpus_root):
+def create_corpus_files(corpus_root, corpus_name=None):
 	'''
 	Create a file for each category (=sub-folder), containing clean tokens
 	for all documents in that category.
 	-Input: path of corpus root
 	-Output: a file for each category, named <categoty_name>.txt, located in
-	 the corpus root
+	 a folder named corpus_name under corpus_root (or right under it if None)
 	-Return: number of categories processed.
 	'''
-	categories = get_items_in_folder(corpus_root)
+	st_time = time.time()
 	
-	for num_cats, category in enumerate(categories):
-		create_category_file(corpus_root, category)
+	categories = corpus_os.get_items_in_folder(corpus_root)
+	
+	clean_root = os.path.join(corpus_root, corpus_name)
+	try:
+		os.mkdir(clean_root)
+	except OSError:
+		# alredy exists, delete and recreate
+		shutil.rmtree(clean_root)
+		os.mkdir(clean_root)
+	print "\n",clean_root
+	
+	for i, category in enumerate(categories):
+		create_category_file(corpus_root, category, clean_root)
+	
+	num_cats = i+1
+	
+	print "\nCreated %d files under %s" % (num_cats, clean_root)
+	print time.time()-st_time, "seconds\n"
 		
-	return num_cats+1
+	return num_cats, clean_root
 
 
 if __name__ == "__main__":
@@ -117,11 +125,7 @@ if __name__ == "__main__":
 	except IndexError:
 		exit()
 	
-	st_time = time.time()
 	num_docs = create_corpus_files(corpus_root)
-	print "\nCreated %d files under %s" % (num_docs, corpus_root)
-	print time.time()-st_time, "seconds\n"
-	
 	'''
 	# Simple test - clean a string:
 	
