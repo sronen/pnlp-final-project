@@ -3,6 +3,7 @@ import operator
 import corpustools as ct
 import nltk
 from nltk.corpus import stopwords
+import corpus_os
 
 def tag_pos_corpus(corpus_to_tag):
 	'''
@@ -48,20 +49,6 @@ def read_pos_from_file(infile):
 	return tagged_words
 
 
-def get_category_names(root_path):
-	'''
-	Intialize categories from a folder names, discarding hidden files (start
-	with '.') and POS directories (start with '_')
-	'''
-	os.listdir(root_path)
-	categories = []
-	for folder in os.listdir(root_path):
-		if folder[0] not in ['.', '_']:
-			categories.append(folder)
-			
-	return categories
-
-
 def clean_pos(tagged_words_to_clean):
 	'''
 	Get a list of (word, POS tag) tuples and remove the irrelevant ones.
@@ -91,7 +78,7 @@ def tag_wiki_corpus(root_path):
 	except OSError:
 		pass # directory already exists
 	
-	categories = get_category_names(root_path)
+	categories = corpus_os.get_items_in_folder(root_path)
 	
 	for category in categories:
 		category_root = root_path+category
