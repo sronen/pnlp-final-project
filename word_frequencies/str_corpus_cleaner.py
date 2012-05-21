@@ -4,6 +4,9 @@ import re
 import codecs
 import os, sys, time
 import corpus_os
+import shutil
+
+from nltk.stem.wordnet import WordNetLemmatizer
 
 # These are the NLTK English stopwords
 STOPWORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'])
@@ -14,7 +17,7 @@ MIN_TOKEN_LENGTH = 3
 # Add the ones you wish to preserve, e.g., 'éèëóő...'
 NON_ENGLISH_CHARS = ''
 
-def get_clean_terms(s):
+def get_clean_terms(s, lemmatize=False):
 	'''
 	Clean the passed string an return the remaining words as a list of terms.
 	Removes punctuation, possessives, too-short words, stopwords,
@@ -42,12 +45,17 @@ def get_clean_terms(s):
 		(NON_ENGLISH_CHARS, NON_ENGLISH_CHARS, NON_ENGLISH_CHARS), re.UNICODE)
 	terms = filter(lambda term: r.match(term), terms)
 	
+	# Lemmatize words if chosen
+	if lemmatize==True:
+		lem = WordNetLemmatizer()
+		terms = map(lambda term: lem.lemmatize(term), terms )
+	
 	#terms = filter(lambda term: re.match("^[a-zA-Z]+[a-zA-Z\'\-]*[a-zA-Z]+$", term), terms)
 	
 	return terms
 
 
-def create_category_file(root_path, category_name, clean_root_path=None):
+def create_category_file(root_path, category_name, clean_root_path=None, lem_flag=False):
 	'''
 	Create a single file containing clean tokens for all documents in the 
 	passed folder. Assume the folder does not contain any sub-folders.
@@ -68,7 +76,7 @@ def create_category_file(root_path, category_name, clean_root_path=None):
 	for i, doc in enumerate(document_list):
 		fin = codecs.open(os.path.join(category_path, doc), 'rU')
 		doc_text = fin.read()
-		folder_terms.extend(get_clean_terms(doc_text))
+		folder_terms.extend(get_clean_terms(doc_text, lemmatize=lem_flag))
 		# Add EOL to distinguish between text from different articles
 		folder_terms.append('\n')
 	
@@ -85,11 +93,12 @@ def create_category_file(root_path, category_name, clean_root_path=None):
 	return num_docs
 
 
-def create_corpus_files(corpus_root, corpus_name=None):
+def create_corpus_files(corpus_root, corpus_name=None, lem_flag=False):
 	'''
 	Create a file for each category (=sub-folder), containing clean tokens
 	for all documents in that category.
-	-Input: path of corpus root
+	-Input: path of corpus root, name of sub-folder to create and place files
+	 in, flag that indicates whether words should be lemmatized
 	-Output: a file for each category, named <categoty_name>.txt, located in
 	 a folder named corpus_name under corpus_root (or right under it if None)
 	-Return: number of categories processed.
@@ -108,7 +117,7 @@ def create_corpus_files(corpus_root, corpus_name=None):
 	print "\n",clean_root
 	
 	for i, category in enumerate(categories):
-		create_category_file(corpus_root, category, clean_root)
+		create_category_file(corpus_root, category, clean_root, lem_flag)
 	
 	num_cats = i+1
 	
@@ -123,9 +132,19 @@ if __name__ == "__main__":
 	try:
 		corpus_root = sys.argv[1]
 	except IndexError:
+		print "Usage: python str_corpus_cleaner.py corpus_root [corpus_name=None]"
 		exit()
+	try:
+		corpus_name = sys.argv[2]
+	except IndexError:
+		corpus_name = None
+	try:
+		corpus_name = sys.argv[3]
+	except IndexError:
+		corpus_name = None
 	
-	num_docs = create_corpus_files(corpus_root)
+	num_docs = create_corpus_files(corpus_root, corpus_name, lem_flag)
+	
 	'''
 	# Simple test - clean a string:
 	
