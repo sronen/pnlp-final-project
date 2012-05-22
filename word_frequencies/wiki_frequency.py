@@ -75,7 +75,7 @@ def classify_article_words(article_words, corpus_tfidfs_per_category, corpus_idf
 	return match, sim_scores
 
 
-def classify_article_file(article_path, tfidfs_per_doc, idfs):
+def classify_article_file(article_path, tfidfs_per_doc, idfs, lem_flag=False):
 	'''
 	classify a single article.
 	-Return: matched category and similarity scores for all categories. 
@@ -83,7 +83,7 @@ def classify_article_file(article_path, tfidfs_per_doc, idfs):
 	st_time = time.time()
 
 	ar_text = codecs.open(article_path, 'rU').read()
-	article_words = str_corpus_cleaner.get_clean_terms(ar_text)	
+	article_words = str_corpus_cleaner.get_clean_terms(ar_text, lem_flag)
 
 	# Classify article
 	match, all_scores = classify_article_words( \
@@ -97,7 +97,7 @@ def classify_article_file(article_path, tfidfs_per_doc, idfs):
 	return match, all_scores
 
 
-def batch_classify_gold(root_path, tfidfs_per_doc, idfs):
+def batch_classify_gold(root_path, tfidfs_per_doc, idfs, lem_flag=False):
 	'''
 	Classify all articles under the given categorized folder.
 	-Return: a dictionary whose keys=article names and values=tuple of
@@ -116,8 +116,8 @@ def batch_classify_gold(root_path, tfidfs_per_doc, idfs):
 			st_time = time.time()
 
 			article_path = os.path.join(category_path, article_file)
-			match, all_scores = \
-				classify_article_file(article_path, tfidfs_per_doc, idfs)
+			match, all_scores = classify_article_file( \
+				article_path, tfidfs_per_doc, idfs, lem_flag)
 
 			#print "%s\t%s\t%s\t(%.3e)\ttime: %.3f sec" % \
 			#	( article_path.split('/')[-1].replace('.txt',''), \
@@ -138,7 +138,7 @@ def print_top_terms(tfidfs, num=20):
 			print '  ', pair
 
 
-def classifiy_wiki_article(search_str, tfidfs_per_doc, idfs):
+def classifiy_wiki_article(search_str, tfidfs_per_doc, idfs, lem_flag=False):
 	'''
 	Get an article from Wikipedia and cllassify it against the provided data
 	TODO: not working...
@@ -149,7 +149,7 @@ def classifiy_wiki_article(search_str, tfidfs_per_doc, idfs):
 	ar_text = \
 		get_wiki.get_specific_wikipedia_article(wiki_url, markup=False)
 	print ar_text	
-	article_words = str_corpus_cleaner.get_clean_terms(ar_text)
+	article_words = str_corpus_cleaner.get_clean_terms(ar_text, lem_flag)
 
 	return classify_article_words(article_words, tfidfs_per_doc, idfs)
 
