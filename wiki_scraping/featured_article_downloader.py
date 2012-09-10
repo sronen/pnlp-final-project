@@ -88,13 +88,11 @@ class WikiThread(threading.Thread):
         else:
             print "fail"
 
+
 def get_featured_wikipedia_articles(dirname, markup=True):
     """
-    Downloads n articles in parallel from Wikipedia and returns lists
-    of their names and contents. Much faster than calling
-    get_random_wikipedia_article() serially.
+    Get the featured articles from Wikipedia
     """
-    
 
     """All biographies have the following structure:
     <h3>
@@ -155,9 +153,14 @@ def get_featured_wikipedia_articles(dirname, markup=True):
     """
 
 def main():
+    try:
+        corpus_root_path = sys.argv[1]
+    except IndexError:
+        corpus_root_path = 'markup_featured_bios'
+
     t0 = time.time()
 
-    get_featured_wikipedia_articles('markup_featured_bios', True)
+    get_featured_wikipedia_articles(corpus_root_path, False)
 
     t1 = time.time()
     print 'took %f' % (t1 - t0)

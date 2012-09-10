@@ -105,7 +105,10 @@ def train_and_test(training_root, test_root, lem_flag=False):
 	
 
 if __name__ == "__main__":	
-	corpus_path = '/Users/shahar/Documents/MIT/Classes/MASS60-PracticalNLP/Project/pnlp-final-project/datasets/cleaned_featured_bios/'
+	try:
+		corpus_path = sys.argv[1]
+	except IndexError:
+		corpus_path = '/Users/shahar/Documents/MIT/Classes/MASS60-PracticalNLP/Project/pnlp-final-project/datasets/cleaned_featured_bios/'
 	
 	# Split corpus
 	training_root, test_root = corpus_os.split_training_and_test(corpus_path)
