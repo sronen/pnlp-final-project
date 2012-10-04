@@ -11,6 +11,8 @@ cleaned_featured_bios: contains featured bios from the 10 categories we used. Th
 
 cleaned_lemmatized_featured_bios_uncat: cleaned and lemmatized, all files are in the same directory. This is used with Mallet.
 
+mallet: topics as clustered by Mallet. wiki_lemm.mallet is the input file, created from the files in cleaned_lemmatized_featured_bios_uncat.
+
 classifier_data.pkl:
 paragraph_data.pkl:
 topics_pickle:
