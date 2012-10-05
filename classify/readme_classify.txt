@@ -1,5 +1,7 @@
 readme.txt
 
+(note: Download Mallet from http://mallet.cs.umass.edu/download.php)
+
 
 1) Get the articles
 
@@ -28,6 +30,10 @@ Split corpus into training and test and store each part in a _training_ or _test
 
 -str_corpus_cleaner.create_corpus_files()
 Prepare the training set: clean (remove punctuation, possessives, too-short words stopwords, and numbers;  lemmatize remaining tokens). Then, for each category, create one file that contains the text of all of its articles. Output files are stored in _training_/_eval_
+
+-str_corpus_cleaner.create_corpus_files_separate()
+**This is not a part of the script, but used with Mallet**
+Prepare the training set: clean (remove punctuation, possessives, too-short words stopwords, and numbers;  lemmatize remaining tokens. Then create a file for each article that contains the clean text.
 
 -train_and_test()
 Calculate the TF*IDFs for the training and return the results (train_and_test()). 
@@ -67,3 +73,4 @@ D) Evaluate the classifier:
 
 Right now the goal is to re-classify every paragraph to the type of bio it came from. Not very useful.
 -python paragraph_classifier.py [number_repetitions] 
+

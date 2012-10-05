@@ -127,6 +127,49 @@ def create_corpus_files(corpus_root, corpus_name=None, lem_flag=False):
 	return num_cats, clean_root
 
 
+def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=False):
+	'''
+	Create a file for each article with only clean tokens.
+	-Input: path of corpus root, name of sub-folder to create and place files
+	 in, flag that indicates whether words should be lemmatized
+	-Output: a file for each article with the original name, located in
+	 a folder named corpus_name under corpus_root (or right under it if None)
+	-Return: number of articles processed.
+	'''
+	st_time = time.time()
+	
+	articles = corpus_os.get_items_in_folder(corpus_root)
+	
+	clean_root = os.path.join(corpus_root, corpus_name)
+	try:
+		os.mkdir(clean_root)
+	except OSError:
+		# alredy exists, delete and recreate
+		shutil.rmtree(clean_root)
+		os.mkdir(clean_root)
+	print "\n",clean_root
+	
+	
+	for i, doc in enumerate(articles):
+		# Get all terms in article (repetitions must be preserved!)
+		fin = codecs.open(os.path.join(corpus_root, doc), 'rU')
+		doc_text = fin.read()
+		# clean them
+		article_text_clean =" ".join(get_clean_terms(doc_text, lemmatize=lem_flag))
+		# write to a new file
+		clean_file_path = os.path.join(clean_root, doc)
+		fout = codecs.open(clean_file_path, 'w')
+		fout.write(article_text_clean) # There's already an EOL at the end
+		fout.close()
+	
+	num_articles = i+1
+	
+	print "\nCreated %d files under %s" % (num_articles, clean_root)
+	print time.time()-st_time, "seconds\n"
+		
+	return num_articles, clean_root
+
+
 if __name__ == "__main__":
 	
 	try:
