@@ -8,6 +8,7 @@ import pickle
 import random
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.classify import apply_features
 
             
 def evaluate(filename, repeat=1, train_percent=.7):
@@ -31,12 +32,17 @@ def evaluate(filename, repeat=1, train_percent=.7):
     return classifier
     
 def get_classifier(filename):
-    data = load_data(filename, 10)
-    classifier = ParagraphClassifier(data, feature_extractor)
+    train_data = load_data(filename, 10)
+    classifier = ParagraphClassifier(train_data, feature_extractor)
     return classifier
     
     
 def get_article_nutritional_label(article_data_list, classifier):
+    """This function will give you the nutritional label breakdown for an
+    individual article. The arguments are the classifier and a list of
+    "data", where the data is a paragraph - the argument to the classifier.
+    It will return a list of all the categories in the article, in order.
+    """
     cats = []
     for data in article_data_list:
         cat = classifier.classify(data)
@@ -45,6 +51,13 @@ def get_article_nutritional_label(article_data_list, classifier):
     
 def get_nutritional_labels(filename, classifier, num_per_cat=25):
     """Get the training data from the target file with pickle.
+    The filename specifies the topic_struct to use, e.g., paragraph_data.
+    Num_per_cat specifies how many articles of each category to look at.
+    
+    This function generates the "breakdown", which is a map from bio_type
+    to another map from category to total. Essentially, this says: give me a profile
+    of what each category is like.
+    
     Infobox data is the data for only bios with infoboxes.
     Full data is the data for all bios."""
 
@@ -119,6 +132,8 @@ def get_nutritional_labels(filename, classifier, num_per_cat=25):
     
 def load_data(filename, num_train_per_cat=15):
     """Get the training data from the target file with pickle.
+    Only get num_train_per_cat articles per category.
+    
     Infobox data is the data for only bios with infoboxes.
     Full data is the data for all bios."""
     
@@ -128,7 +143,7 @@ def load_data(filename, num_train_per_cat=15):
     # data is formatted as dict<'biography_type', dict<'article_name', (list<'section_heading'>, list<'infobox_feature'>)>>
     # want to format as list<('section_heading', 'biography_type')>
     training_data = list()
-    test_data = list()
+#    test_data = list()
     avg_paragraphs = 0
     num_articles = 0
     for bio_type, articles in topic_struct.items():
@@ -150,14 +165,16 @@ class ParagraphClassifier():
         self.feature_extractor = feature_extractor
         train_set = []
         
-        numtimes = 0
+        train_set = apply_features(feature_extractor, golden_data)
+        
+        """numtimes = 0
         for (data, bio_type) in golden_data:
             numtimes += 1
             if numtimes % 100 == 0:
                 print numtimes
             featureset = self.feature_extractor(data)
             train_set.append( (featureset, bio_type) )
-        print "about to train"
+        print "about to train"""
             
         self.classifier = nltk.NaiveBayesClassifier.train(train_set)
         print "done training"
@@ -173,6 +190,7 @@ def feature_extractor(data):
 
     h2, h3, paragraph = data
     
+    """
     features['h2_' + h2.lower()] = True
     for word in h2.split(' '):
         if word.lower() not in stopwords.words('english') and len(word) > 1:
@@ -181,7 +199,8 @@ def feature_extractor(data):
     for word in h2.split(' '):
         if word.lower() not in stopwords.words('english') and len(word) > 1:
             features['hword_' + word.lower()] = True
-
+    """
+    """
     if h3 != None:    
         features['h3_' + h3.lower()] = True
         for word in h3.split(' '):
@@ -191,12 +210,15 @@ def feature_extractor(data):
         for word in h3.split(' '):
             if word.lower() not in stopwords.words('english') and len(word) > 1:
                 features['hword_' + word.lower()] = True
-        
+    """ 
     for word in nltk.wordpunct_tokenize(paragraph):
         if word.lower() not in stopwords.words('english') and len(word) > 1:
+            """
             features[word] = True
             features['lower_' + word.lower()] = True
             features['lmtzr_' + lmtzr.lemmatize(word).lower()] = True
+            """
+            features[lmtzr.lemmatize(word).lower()] = True
     return features
     
 if __name__ == '__main__':

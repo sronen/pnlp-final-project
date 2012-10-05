@@ -37,10 +37,33 @@ Compare results to reference and compute recall, precision, and f-measure.
 
 3) Run Classifier: Naive Bayes
 ********************************
+In this section, ">>" means you should run this command from your python shell.
 
 A) Clean and store the relatively-plain text:
--From a python shell, run: article_cleaner.make_paragraph_dataset()
--Pickle the result using pickle.dump(). Name the pickled file paragraph_data.pkl
 
-B) Run the classifier: 
-python paragraph_classifier.py [number_repeitions] 
+>> paragraph_data = article_cleaner.make_paragraph_dataset()
+Pickle the result, and name it paragraph_data.pkl.
+>> pickle.dump(paragraph_data, open('paragraph_data.pkl', 'w'))
+
+B) Get a nutritional label for a specific article:
+
+Get the "data list" for the article - essentially, this is a list of paragraphs. It is
+called a data list because each paragraph is classified separately. The data list can
+be found in the paragraph_data.pkl file you made earlier.
+>> article_data = paragraph_data_pkl[bio_type][article_name]
+
+Get a paragraph classifier. 
+>> classifier = paragraph_classifier.get_classifier('paragraph_data.pkl')
+
+Run the classifier on the article data:
+>> paragraph_classifier.get_article_nutritional_label(article_data_list, classifier)
+
+C) Get a breakdown of how often each nutritional label is used for a given bio type:
+
+Run this command, where we look at num_per_cat articles in each category.
+>> paragraph_classifier.get_nutritional_labels('paragraph_data.pkl', classifier, num_per_cat)
+
+D) Evaluate the classifier:
+
+Right now the goal is to re-classify every paragraph to the type of bio it came from. Not very useful.
+-python paragraph_classifier.py [number_repetitions] 
