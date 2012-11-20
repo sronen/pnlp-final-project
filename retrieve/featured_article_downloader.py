@@ -2,35 +2,31 @@ import sys, urllib2, re, string, time, threading
 from BeautifulSoup import BeautifulSoup
 import os
 
-def get_specific_wikipedia_article(wiki_url, markup=True):
+def get_specific_wikipedia_article(wiki_url, markup=True, language='en', articletitle=None):  
     """
-    Downloads a randomly selected Wikipedia article (via
-    http://en.wikipedia.org/wiki/Special:Random) and strips out (most
-    of) the formatting, links, etc. 
-
-    This function is a bit simpler and less robust than the code that
-    was used for the experiments in "Online VB for LDA."
+    Gets a specific wikipedia article, given the url.
+    Note: you should really pass the title if you are working with non-English.
     """
-
-    articletitle = None
     failed = False
     try:
-        req = urllib2.Request(wiki_url,
-                              None, { 'User-Agent' : 'x'})
-        f = urllib2.urlopen(req)
-        while not articletitle:
-            line = f.readline()
-            result = re.search(r'title="Edit this page" href="/w/index.php\?title=(.*)\&amp;action=edit" /\>', line)
-            if (result):
-                articletitle = result.group(1)
-                break
-            elif (len(line) < 1):
-                return None
-        
+        if articletitle == None:
+            req = urllib2.Request(wiki_url,
+                                  None, { 'User-Agent' : 'x'})
+            f = urllib2.urlopen(req)
+
+            while not articletitle:
+                line = f.readline()
+                result = re.search(r'title="Edit this page" href="/w/index.php\?title=(.*)\&amp;action=edit" /\>', line)
+                if (result):
+                    articletitle = result.group(1)
+                    break
+                elif (len(line) < 1):
+                    return None
+
         if markup:
-            base_url = 'http://en.wikipedia.org/w/index.php?title=Special:Export/%s&action=submit'
+            base_url = 'http://' + language + '.wikipedia.org/w/index.php?title=Special:Export/%s&action=submit'
         else:
-            base_url = 'http://en.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s'
+            base_url = 'http://' + language + '.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s'
         
         req = urllib2.Request(base_url % (articletitle),
                               None, { 'User-Agent' : 'x'})
@@ -88,6 +84,55 @@ class WikiThread(threading.Thread):
         else:
             print "fail"
 
+def get_french_versions_of_downloaded_articles(english_dirname, french_dirname, markup=True):
+    """
+    english_dirname should be a directory full of category folders, which are each full of articles
+    where the filenames are Wikipedia_Article_Name.txt.
+
+    This procedure will look up all the English articles, find the name of the corresponding French articles,
+    and then download them and put them in french_dirname with the same directory structure.
+    """
+    if not os.path.exists(english_dirname):
+        raise Exception("English directory doesn't exist.")
+    if not os.path.exists(french_dirname):
+        os.mkdir(french_dirname);
+
+    listing = os.listdir(english_dirname)
+    for subdir in listing:
+        if not os.path.isdir(english_dirname + '/' + subdir):
+            continue
+        if not os.path.exists(french_dirname + '/' + subdir):
+            os.mkdir(french_dirname+ '/' + subdir)
+        
+        files = os.listdir(english_dirname + '/' + subdir)
+        for filename in files:
+
+            #eng_text = open(english_dirname + '/' + subdir + '/' + filename).read().decode('utf-8')
+
+            english_url = 'http://en.wikipedia.org/wiki/' + filename
+            try:
+                req = urllib2.Request(english_url, None, { 'User-Agent' : 'x'})
+                f = urllib2.urlopen(req)
+            except (urllib2.HTTPError, urllib2.URLError):
+                continue
+
+            re_result = re.search(r'<li class="interwiki-fr"><a href="(.*)" title="(.*)" lang=', f.read())
+            if (re_result != None):
+                french_url = 'http:' + re_result.group(1)
+                french_title = re.search(r'/wiki/(.*)', french_url).group(1)
+                result = get_specific_wikipedia_article(french_url, markup, language='fr', articletitle=french_title)
+
+                if result != None:
+                    (article_text, article_title) = result
+                    article_title = article_title.replace('/', '_')
+                    f = open(french_dirname + '/' + subdir + '/' + article_title, 'w')
+                    f.write(article_text)
+                else:
+                    print 'Failed to download ',article_title
+
+
+def get_featured_french_articles(dirname, markup=True):
+    pass
 
 def get_featured_wikipedia_articles(dirname, markup=True):
     """
@@ -154,7 +199,17 @@ def get_featured_wikipedia_articles(dirname, markup=True):
 
 def main():
     try:
-        corpus_root_path = sys.argv[1]
+        if sys.argv[1] == 'french':
+            if len(sys.argv) > 3:
+                markup = False
+                if len(sys.argv) > 4:
+                    markup = bool(int(sys.argv[4]))
+                get_french_versions_of_downloaded_articles(sys.argv[2], sys.argv[3], False)
+            else:
+                print 'usage: french english_dirname french_dirname'
+            return
+        else:
+            corpus_root_path = sys.argv[1]
     except IndexError:
         corpus_root_path = 'markup_featured_bios'
 

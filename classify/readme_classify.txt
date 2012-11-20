@@ -7,7 +7,9 @@ readme.txt
 
 Run: python featured_article_downloader.py corpus_path
 
-Creates a folder containing bio articles in relatively plain text (there are still some tags), with a sub-folder for each category; each aritlce is stored in its own text file.=
+Creates a folder containing bio articles in relatively plain text (there are still some tags), with a sub-folder for each category; each aritlce is stored in its own text file.
+
+French: python featured_article_downloader.py french english_path french_path (requires you to have already downloaded the English articles. This script goes and downloads the French versions of all those articles.)
 
 
 2) Run classifier: TF*IDF

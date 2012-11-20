@@ -78,9 +78,9 @@ def match_topics(lda_results_caps, lda_results_nocaps):
 	for i in range(len(nocaps_tf_arrays.keys())):
 		cosdists = list()
 		for j in range(len(caps_tf_arrays.keys())):
-			cosdist = cosine_distance(caps_tf_arrays[i], nocaps_tf_arrays[j])
+			cosdist = cosine_distance(caps_tf_arrays[j], nocaps_tf_arrays[i])
 			cosdists.append((cosdist, j))
-		best3 = sorted(cosdists)[:3]
+		best3 = sorted(cosdists, reverse=True)[:3]
 		print (i, best3)
 		top_nocaps_matches.append(best3)
 	return top_nocaps_matches
