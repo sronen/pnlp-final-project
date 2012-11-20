@@ -8,11 +8,12 @@ import shutil
 import string
 
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.snowball import FrenchStemmer
 from nltk.corpus import stopwords
 
 # These are the NLTK English stopwords
 #STOPWORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'])
-STOPWORDS = stopwords.words('english')
+#STOPWORDS = stopwords.words('english')
 
 # Tokens must be at least this long or they're discarded
 MIN_TOKEN_LENGTH = 3
@@ -27,7 +28,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
     return to_translate.translate(translate_table)
 
 
-def get_clean_terms(s, decap=True, lemmatize=True):
+def get_clean_terms(s, decap=True, lemmatize=True, language='en'):
 	'''
 	Clean the passed string an return the remaining words as a list of terms.
 	Removes punctuation, possessives, too-short words, stopwords,
@@ -43,12 +44,14 @@ def get_clean_terms(s, decap=True, lemmatize=True):
 	# Remove numbers (" \d+"), English possesives ("['s? ]") , and punctuation, in this order
 	#st = re.sub("\d+|\'s|[:;,?!#$%()\'\"\.]\| - ", "", s.decode('utf-8'), re.UNICODE)
 	
-	# Remove English possesives
-	st = st.replace('\'s ', ' ').replace('s\' ', ' ') 
+	if language == 'en':
+		# Remove English possesives
+		st = st.replace('\'s ', ' ').replace('s\' ', ' ') 
 
 	# Remove punctuation and digits: list chars to delete
 	to_delete = u'!"#%\'()*+,–-./:;<=>?@[\]^_`’{|}~'+string.digits
-	st = translate_non_alphanumerics(st, ' ', to_delete) # replace with space
+#	st = translate_non_alphanumerics(st, u' ', to_delete) # replace with space
+	st = translate_non_alphanumerics(st, u' ', to_delete) # replace with space
 
 
 	orig_terms = st.split()
@@ -78,16 +81,40 @@ def get_clean_terms(s, decap=True, lemmatize=True):
 	# Remove words that are too short. TODO: adjust for unicode?
 	terms = filter(lambda term: len(term) >= MIN_TOKEN_LENGTH, terms)
 	
-	# Remove stopwords (English)
-	terms = filter(lambda term: term not in STOPWORDS, terms)
+	# Remove Stopwords.
+	terms = remove_stopwords(language, terms)
 
 	# Lemmatize words if chosen
 	if lemmatize==True:
-		lem = WordNetLemmatizer()
-		terms = map(lambda term: lem.lemmatize(term), terms )
+		if language == 'en':
+			lem = WordNetLemmatizer()
+			terms = map(lambda term: lem.lemmatize(term), terms )
+		elif language == 'fr':
+			stemmer = FrenchStemmer()
+			terms = map(lambda term: stemmer.stem(term), terms)
+
+	# Remove stopwords again if non-English, post-lemmatization
+	if language != 'en':
+		terms = remove_stopwords(language, terms)
 
 	return terms
 
+def remove_stopwords(language='en', terms):
+	# Remove stopwords. Note that nltk.corpus's stopwords are quite incomplete for non-English.
+	if language == 'en':
+		STOPWORDS = set(stopwords.words('english'))
+	elif language == 'fr':
+		STOPWORDS = set(stopwords.words('french'))
+		files = 'stop-words/stop-words-french.txt', 'stop-words/stop-words-french2.txt'
+		for filename in files:
+			f = open(os.path.dirname(__file__) + '/' + filename, 'r')
+			for line in f.readlines():
+				split = line.split()
+				if len(split) == 0:
+					continue
+				word = split[0]
+				STOPWORDS.add(word)
+	return filter(lambda term: term.encode('utf-8') not in STOPWORDS, terms)
 
 def create_category_file(root_path, category_name, clean_root_path=None, lem_flag=True, decap_flag=True):
 	'''
@@ -161,7 +188,7 @@ def create_corpus_files(corpus_root, corpus_name=None, lem_flag=True, decap_flag
 	return num_cats, clean_root
 
 
-def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True):
+def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True, language='en'):
 	'''
 	Create a file for each article with only clean tokens.
 	-Input: path of corpus root, name of sub-folder to create and place files
@@ -196,7 +223,7 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 
 		doc_text = fin.read()
 		# clean them
-		article_text_clean =" ".join(get_clean_terms(doc_text, lemmatize=lem_flag, decap=decap_flag))
+		article_text_clean =" ".join(get_clean_terms(doc_text, lemmatize=lem_flag, decap=decap_flag, language=language))
 		# write to a new file
 		clean_file_path = os.path.join(clean_root, doc)
 		fout = codecs.open(clean_file_path, 'w')
@@ -212,11 +239,10 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 
 
 if __name__ == "__main__":
-	
 	try:
 		corpus_root = sys.argv[1]
 	except IndexError:
-		print "Usage: python str_corpus_cleaner.py corpus_root [corpus_name=None] [lemmatize=y/n] [decap=y/n]"
+		print "Usage: python str_corpus_cleaner.py corpus_root [corpus_name=None] [lemmatize=y/n] [decap=y/n] [lang='en'/'fr']"
 		exit()
 	try:
 		corpus_name = sys.argv[2]
@@ -230,8 +256,16 @@ if __name__ == "__main__":
 		decap_flag = False if sys.argv[4]=="n" else True
 	except IndexError:
 		lem_flag = True
+	try:
+		lang = sys.argv[5]
+	except IndexError:
+		lang = 'en'
 	
-	num_docs = create_corpus_files_separate(corpus_root, corpus_name, lem_flag=lem_flag, decap_flag=decap_flag)
+	num_docs = create_corpus_files_separate(corpus_root, 
+											corpus_name, 
+											lem_flag=lem_flag, 
+											decap_flag=decap_flag, 
+											language=lang)
 	#path of corpus root, name of sub-folder to create and place files
 	# in, flag that indicates whether words should be lemmatized
 	

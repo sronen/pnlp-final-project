@@ -84,48 +84,49 @@ class WikiThread(threading.Thread):
         else:
             print "fail"
 
-def get_french_versions_of_downloaded_articles(english_dirname, french_dirname, markup=True):
+def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirname, 
+                                                    language='fr', markup=True, original_language='en'):
     """
-    english_dirname should be a directory full of category folders, which are each full of articles
+    original_dirname should be a directory full of category folders, which are each full of articles
     where the filenames are Wikipedia_Article_Name.txt.
 
     This procedure will look up all the English articles, find the name of the corresponding French articles,
-    and then download them and put them in french_dirname with the same directory structure.
+    and then download them and put them in new_dirname with the same directory structure.
     """
-    if not os.path.exists(english_dirname):
-        raise Exception("English directory doesn't exist.")
-    if not os.path.exists(french_dirname):
-        os.mkdir(french_dirname);
+    if not os.path.exists(original_dirname):
+        raise Exception("Original directory doesn't exist.")
+    if not os.path.exists(new_dirname):
+        os.mkdir(new_dirname);
 
-    listing = os.listdir(english_dirname)
+    listing = os.listdir(original_dirname)
     for subdir in listing:
-        if not os.path.isdir(english_dirname + '/' + subdir):
+        if not os.path.isdir(original_dirname + '/' + subdir):
             continue
-        if not os.path.exists(french_dirname + '/' + subdir):
-            os.mkdir(french_dirname+ '/' + subdir)
+        if not os.path.exists(new_dirname + '/' + subdir):
+            os.mkdir(new_dirname+ '/' + subdir)
         
-        files = os.listdir(english_dirname + '/' + subdir)
+        files = os.listdir(original_dirname + '/' + subdir)
         for filename in files:
 
-            #eng_text = open(english_dirname + '/' + subdir + '/' + filename).read().decode('utf-8')
+            #eng_text = open(original_dirname + '/' + subdir + '/' + filename).read().decode('utf-8')
 
-            english_url = 'http://en.wikipedia.org/wiki/' + filename
+            original_url = 'http://' + original_language + '.wikipedia.org/wiki/' + filename
             try:
                 req = urllib2.Request(english_url, None, { 'User-Agent' : 'x'})
                 f = urllib2.urlopen(req)
             except (urllib2.HTTPError, urllib2.URLError):
                 continue
 
-            re_result = re.search(r'<li class="interwiki-fr"><a href="(.*)" title="(.*)" lang=', f.read())
+            re_result = re.search(r'<li class="interwiki-' + language + r'"><a href="(.*)" title="(.*)" lang=', f.read())
             if (re_result != None):
-                french_url = 'http:' + re_result.group(1)
-                french_title = re.search(r'/wiki/(.*)', french_url).group(1)
-                result = get_specific_wikipedia_article(french_url, markup, language='fr', articletitle=french_title)
+                new_url = 'http:' + re_result.group(1)
+                new_title = re.search(r'/wiki/(.*)', new_url).group(1)
+                result = get_specific_wikipedia_article(new_url, markup, language, articletitle=new_title)
 
                 if result != None:
                     (article_text, article_title) = result
                     article_title = article_title.replace('/', '_')
-                    f = open(french_dirname + '/' + subdir + '/' + article_title, 'w')
+                    f = open(new_dirname + '/' + subdir + '/' + article_title, 'w')
                     f.write(article_text)
                 else:
                     print 'Failed to download ',article_title
@@ -199,15 +200,15 @@ def get_featured_wikipedia_articles(dirname, markup=True):
 
 def main():
     try:
-        if sys.argv[1] == 'french':
-            if len(sys.argv) > 3:
-                markup = False
-                if len(sys.argv) > 4:
-                    markup = bool(int(sys.argv[4]))
-                get_french_versions_of_downloaded_articles(sys.argv[2], sys.argv[3], False)
-            else:
-                print 'usage: french english_dirname french_dirname'
-            return
+        if len(sys.argv) > 4:
+            markup = False
+            old_lang = 'en'
+            if len(sys.argv) > 5:
+                markup = bool(int(sys.argv[5]))
+            if len(sys.argv) > 6:
+                old_lang = sys.argv[6]
+            get_new_language_versions_of_downloaded_articles(sys.argv[2], sys.argv[3], sys.argv[4], markup, old_lang)
+
         else:
             corpus_root_path = sys.argv[1]
     except IndexError:
