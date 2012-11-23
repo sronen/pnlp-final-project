@@ -112,6 +112,7 @@ def remove_stopwords(language, terms, stopwords_file):
 	if stopwords_file == None:
 		STOPWORDS = set(stopwords.words(language))
 	else:
+		STOPWORDS = set()
 		f = open(stopwords_file, 'r')
 		for line in f.readlines():
 			split = line.split()

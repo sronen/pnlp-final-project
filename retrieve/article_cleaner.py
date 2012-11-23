@@ -7,9 +7,9 @@ def clean_plaintext_article(text, extract, end_indicators_file):
     f = open(end_indicators_file, 'r')
     for line in f.readlines():
         if line.split()[0] == 'exact':
-            text = re.sub(line.split()[1] + r'.*', '', text, flags=re.DOTALL)
+            text = re.sub([a.decode('utf-8') for a in line.split()][1] + r'.*', '', text, flags=re.DOTALL)
         else:
-            text = re.sub(r'&lt;h[23]&gt;\s*' + ' '.join(line.split()) + r'\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
+            text = re.sub(r'&lt;h[23]&gt;\s*' + ' '.join([a.decode('utf-8') for a in line.split()]) + r'\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
     
     text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
     if extract:
