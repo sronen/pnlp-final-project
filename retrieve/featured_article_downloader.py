@@ -118,26 +118,36 @@ def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirna
 
             #eng_text = open(original_dirname + '/' + subdir + '/' + filename).read().decode('utf-8')
 
-            original_url = 'http://' + original_language + '.wikipedia.org/wiki/' + filename
-            try:
-                req = urllib2.Request(original_url, None, { 'User-Agent' : 'x'})
-                f = urllib2.urlopen(req)
-            except (urllib2.HTTPError, urllib2.URLError):
-                continue
+            original_url = 'http://' + original_language + '.wikipedia.org/wiki/' + urllib2.quote(urllib2.unquote(filename))
 
-            re_result = re.search(r'<li class="interwiki-' + language + r'"><a href="(.*)" title="(.*)" lang=', f.read())
-            if (re_result != None):
-                new_url = 'http:' + re_result.group(1)
-                new_title = re.search(r'/wiki/(.*)', new_url).group(1)
-                result = get_specific_wikipedia_article(new_url, markup, language, articletitle=new_title)
+            if language == original_language:
 
-                if result != None:
-                    (article_text, article_title) = result
-                    article_title = urllib2.unquote(article_title).replace('/', '_')
-                    f = open(new_dirname + '/' + subdir + '/' + article_title, 'w')
-                    f.write(article_text)
-                else:
-                    print 'Failed to download ',article_title
+                article_title = urllib2.quote(urllib2.unquote(filename))
+                (article_text, article_title) = get_specific_wikipedia_article(original_url, markup, language, articletitle=article_title)
+                newf = open(new_dirname + '/' + subdir + '/' + urllib2.unquote(filename), 'w')
+                newf.write(article_text)
+
+            else:
+                
+                try:
+                    req = urllib2.Request(original_url, None, { 'User-Agent' : 'x'})
+                    f = urllib2.urlopen(req)
+                except (urllib2.HTTPError, urllib2.URLError):
+                    continue
+
+                re_result = re.search(r'<li class="interwiki-' + language + r'"><a href="(.*)" title="(.*)" lang=', f.read())
+                if (re_result != None):
+                    new_url = 'http:' + re_result.group(1)
+                    new_title = re.search(r'/wiki/(.*)', new_url).group(1)
+                    result = get_specific_wikipedia_article(new_url, markup, language, articletitle=new_title)
+
+                    if result != None:
+                        (article_text, article_title) = result
+                        article_title = urllib2.unquote(article_title).replace('/', '_')
+                        f = open(new_dirname + '/' + subdir + '/' + article_title, 'w')
+                        f.write(article_text)
+                    else:
+                        print 'Failed to download ',article_title
 
 
 

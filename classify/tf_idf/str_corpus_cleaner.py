@@ -27,7 +27,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
     return to_translate.translate(translate_table)
 
 
-def get_clean_terms(s, decap=True, lemmatize=True, language='en', stopwords_file='None'):
+def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords_file='None'):
 	'''
 	Clean the passed string an return the remaining words as a list of terms.
 	Removes punctuation, possessives, too-short words, stopwords,
@@ -99,6 +99,10 @@ def lemmatize_or_stem(language, terms):
 	elif language == 'french':
 		from nltk.stem.snowball import FrenchStemmer
 		stemmer = FrenchStemmer()
+		terms = map(lambda term: stemmer.stem(term), terms)
+	elif language == 'spanish':
+		from nltk.stem.snowball import SpanishStemmer
+		stemmer = SpanishStemmer()
 		terms = map(lambda term: stemmer.stem(term), terms)
 	return terms
 
@@ -276,9 +280,9 @@ if __name__ == "__main__":
 	except IndexError:
 		lem_flag = True
 	try:
-		lang = sys.argv[5]
+		language = sys.argv[5]
 	except IndexError:
-		lang = 'english'
+		language = 'english'
 	try:
 		make_new_dir = False if sys.argv[6]=='n' else True
 	except IndexError:
@@ -292,7 +296,7 @@ if __name__ == "__main__":
 											corpus_name, 
 											lem_flag=lem_flag, 
 											decap_flag=decap_flag, 
-											language=lang,
+											language=language,
 											make_new_dir=make_new_dir,
 											stopwords_file=stopwords_file)
 	#path of corpus root, name of sub-folder to create and place files

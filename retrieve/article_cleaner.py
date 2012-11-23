@@ -4,23 +4,19 @@ def clean_plaintext_article(text, extract, end_indicators_file):
     """As input, takes the plain text from a wikipedia article that we got from
     the Wikipedia API's extract field, which isn't quite plain text, and removes the
     remaining HTML tags."""
-    try:
-        f = open(end_indicators_file, 'r')
-        for line in f.readlines():
-            if line.split()[0] == 'exact':
-                text = re.sub(line.split()[1] + r'.*', '', text, flags=re.DOTALL)
-            else:
-                text = re.sub(r'&lt;h[23]&gt;\s*' + ' '.join(line.split()) + r'\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
-        
-        text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
-        if extract:
-            return text
-        text = re.sub(r'&lt;.*?&gt;', '', text) # remove all html tags
-        text = re.sub(r'&[^;\s]*?;', '', text) # remove all other markings, e.g. &quot;
-    except:
-        # Something went wrong, try again. (This is bad coding practice.)
-        print 'oops. there was a failure parsing'
-        return "error"
+    f = open(end_indicators_file, 'r')
+    for line in f.readlines():
+        if line.split()[0] == 'exact':
+            text = re.sub(line.split()[1] + r'.*', '', text, flags=re.DOTALL)
+        else:
+            text = re.sub(r'&lt;h[23]&gt;\s*' + ' '.join(line.split()) + r'\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
+    
+    text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
+    if extract:
+        return text
+    text = re.sub(r'&lt;.*?&gt;', '', text) # remove all html tags
+    text = re.sub(r'&[^;\s]*?;', '', text) # remove all other markings, e.g. &quot;
+
     return text
  
 def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, consolidate_folders=True):
@@ -32,6 +28,8 @@ def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, conso
 
     listing = os.listdir(src_dir)
     for subdir in listing:
+        if not os.path.isdir(src_dir + '/' + subdir):
+            continue
         if not consolidate_folders:
             if not os.path.exists(target_dir + '/' + subdir):
                 os.mkdir(target_dir + '/' + subdir)
