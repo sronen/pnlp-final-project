@@ -1,6 +1,14 @@
 import sys, urllib2, re, string, time, threading
 from BeautifulSoup import BeautifulSoup
-import os
+import os, errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
 
 def get_specific_wikipedia_article(wiki_url, markup=True, language='en', articletitle=None):  
     """
@@ -96,7 +104,7 @@ def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirna
     if not os.path.exists(original_dirname):
         raise Exception("Original directory doesn't exist.")
     if not os.path.exists(new_dirname):
-        os.mkdir(new_dirname);
+        mkdir_p(new_dirname);
 
     listing = os.listdir(original_dirname)
     for subdir in listing:
@@ -112,7 +120,7 @@ def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirna
 
             original_url = 'http://' + original_language + '.wikipedia.org/wiki/' + filename
             try:
-                req = urllib2.Request(english_url, None, { 'User-Agent' : 'x'})
+                req = urllib2.Request(original_url, None, { 'User-Agent' : 'x'})
                 f = urllib2.urlopen(req)
             except (urllib2.HTTPError, urllib2.URLError):
                 continue
@@ -125,15 +133,13 @@ def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirna
 
                 if result != None:
                     (article_text, article_title) = result
-                    article_title = article_title.replace('/', '_')
+                    article_title = urllib2.unquote(article_title).replace('/', '_')
                     f = open(new_dirname + '/' + subdir + '/' + article_title, 'w')
                     f.write(article_text)
                 else:
                     print 'Failed to download ',article_title
 
 
-def get_featured_french_articles(dirname, markup=True):
-    pass
 
 def get_featured_wikipedia_articles(dirname, markup=True):
     """
@@ -200,15 +206,15 @@ def get_featured_wikipedia_articles(dirname, markup=True):
 
 def main():
     try:
-        if len(sys.argv) > 4:
+        if len(sys.argv) > 3:
             markup = False
             old_lang = 'en'
+            if len(sys.argv) > 4:
+                markup = bool(int(sys.argv[4]))
             if len(sys.argv) > 5:
-                markup = bool(int(sys.argv[5]))
-            if len(sys.argv) > 6:
-                old_lang = sys.argv[6]
-            get_new_language_versions_of_downloaded_articles(sys.argv[2], sys.argv[3], sys.argv[4], markup, old_lang)
-
+                old_lang = sys.argv[5]
+            get_new_language_versions_of_downloaded_articles(sys.argv[1], sys.argv[2], sys.argv[3], markup, old_lang)
+            return
         else:
             corpus_root_path = sys.argv[1]
     except IndexError:

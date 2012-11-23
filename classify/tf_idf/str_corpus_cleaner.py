@@ -8,7 +8,6 @@ import shutil
 import string
 
 from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.snowball import FrenchStemmer
 from nltk.corpus import stopwords
 
 # These are the NLTK English stopwords
@@ -28,7 +27,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
     return to_translate.translate(translate_table)
 
 
-def get_clean_terms(s, decap=True, lemmatize=True, language='en'):
+def get_clean_terms(s, decap=True, lemmatize=True, language='en', stopwords_file='None'):
 	'''
 	Clean the passed string an return the remaining words as a list of terms.
 	Removes punctuation, possessives, too-short words, stopwords,
@@ -44,7 +43,7 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='en'):
 	# Remove numbers (" \d+"), English possesives ("['s? ]") , and punctuation, in this order
 	#st = re.sub("\d+|\'s|[:;,?!#$%()\'\"\.]\| - ", "", s.decode('utf-8'), re.UNICODE)
 	
-	if language == 'en':
+	if language == 'english':
 		# Remove English possesives
 		st = st.replace('\'s ', ' ').replace('s\' ', ' ') 
 
@@ -82,26 +81,41 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='en'):
 	terms = filter(lambda term: len(term) >= MIN_TOKEN_LENGTH, terms)
 	
 	# Remove Stopwords.
-	terms = remove_stopwords(language, terms)
+	terms = remove_stopwords(language, terms, stopwords_file)
 
 	# Lemmatize words if chosen
 	if lemmatize==True:
-		if language == 'en':
-			lem = WordNetLemmatizer()
-			terms = map(lambda term: lem.lemmatize(term), terms )
-		elif language == 'fr':
-			stemmer = FrenchStemmer()
-			terms = map(lambda term: stemmer.stem(term), terms)
+		terms = lemmatize_or_stem(language, terms)
 
-	# Remove stopwords again if non-English, post-lemmatization
-	if language != 'en':
-		terms = remove_stopwords(language, terms)
+	# Remove stopwords again, post-lemmatization/stemming
+	terms = remove_stopwords(language, terms, stopwords_file)
 
 	return terms
 
-def remove_stopwords(language='en', terms):
-	# Remove stopwords. Note that nltk.corpus's stopwords are quite incomplete for non-English.
-	if language == 'en':
+def lemmatize_or_stem(language, terms):
+	if language == 'english':
+		lem = WordNetLemmatizer()
+		terms = map(lambda term: lem.lemmatize(term), terms )
+	elif language == 'french':
+		from nltk.stem.snowball import FrenchStemmer
+		stemmer = FrenchStemmer()
+		terms = map(lambda term: stemmer.stem(term), terms)
+	return terms
+
+def remove_stopwords(language, terms, stopwords_file):
+	# Remove stopwords. Use stopwords_file instead of nltk.corpus, if available.
+	# Note that nltk.corpus's stopwords are quite incomplete for non-English.
+	if stopwords_file == None:
+		STOPWORDS = set(stopwords.words(language))
+	else:
+		f = open(stopwords_file, 'r')
+		for line in f.readlines():
+			split = line.split()
+			if len(split) == 0:
+				continue
+			word = split[0]
+			STOPWORDS.add(word)
+	"""if language == 'en':
 		STOPWORDS = set(stopwords.words('english'))
 	elif language == 'fr':
 		STOPWORDS = set(stopwords.words('french'))
@@ -113,7 +127,7 @@ def remove_stopwords(language='en', terms):
 				if len(split) == 0:
 					continue
 				word = split[0]
-				STOPWORDS.add(word)
+				STOPWORDS.add(word)"""
 	return filter(lambda term: term.encode('utf-8') not in STOPWORDS, terms)
 
 def create_category_file(root_path, category_name, clean_root_path=None, lem_flag=True, decap_flag=True):
@@ -188,7 +202,8 @@ def create_corpus_files(corpus_root, corpus_name=None, lem_flag=True, decap_flag
 	return num_cats, clean_root
 
 
-def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True, language='en'):
+def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True, 
+								language='english', make_new_dir=False, stopwords_file=None):
 	'''
 	Create a file for each article with only clean tokens.
 	-Input: path of corpus root, name of sub-folder to create and place files
@@ -200,8 +215,10 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 	st_time = time.time()
 	
 	articles = corpus_os.get_items_in_folder(corpus_root)
-	
-	clean_root = os.path.join(corpus_root, corpus_name)
+	if make_new_dir:
+		clean_root = corpus_name
+	else:
+		clean_root = os.path.join(corpus_root, corpus_name)
 	try:
 		os.mkdir(clean_root)
 	except OSError:
@@ -223,7 +240,8 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 
 		doc_text = fin.read()
 		# clean them
-		article_text_clean =" ".join(get_clean_terms(doc_text, lemmatize=lem_flag, decap=decap_flag, language=language))
+		article_text_clean =" ".join(get_clean_terms(doc_text, lemmatize=lem_flag, 
+													decap=decap_flag, language=language, stopwords_file=stopwords_file))
 		# write to a new file
 		clean_file_path = os.path.join(clean_root, doc)
 		fout = codecs.open(clean_file_path, 'w')
@@ -242,7 +260,8 @@ if __name__ == "__main__":
 	try:
 		corpus_root = sys.argv[1]
 	except IndexError:
-		print "Usage: python str_corpus_cleaner.py corpus_root [corpus_name=None] [lemmatize=y/n] [decap=y/n] [lang='en'/'fr']"
+		print "Usage: python str_corpus_cleaner.py corpus_root [corpus_name=None] [lemmatize=y/n] [decap=y/n] [lang='en'/'fr']\
+				[make_new_dir=n]"
 		exit()
 	try:
 		corpus_name = sys.argv[2]
@@ -259,13 +278,23 @@ if __name__ == "__main__":
 	try:
 		lang = sys.argv[5]
 	except IndexError:
-		lang = 'en'
+		lang = 'english'
+	try:
+		make_new_dir = False if sys.argv[6]=='n' else True
+	except IndexError:
+		make_new_dir=False
+	try:
+		stopwords_file = sys.argv[7]
+	except IndexError:
+		stopwords_file = None
 	
 	num_docs = create_corpus_files_separate(corpus_root, 
 											corpus_name, 
 											lem_flag=lem_flag, 
 											decap_flag=decap_flag, 
-											language=lang)
+											language=lang,
+											make_new_dir=make_new_dir,
+											stopwords_file=stopwords_file)
 	#path of corpus root, name of sub-folder to create and place files
 	# in, flag that indicates whether words should be lemmatized
 	
