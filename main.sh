@@ -5,7 +5,7 @@
 # ./main.sh french fr
 # ./main.sh spanish es
 
-if [ $# < 2 ]
+if [ $# -lt 2 ]
 then
 	echo "Usage: ./main.sh language-name wiki-language-code [run-mallet=y/n, default:y]"
 else

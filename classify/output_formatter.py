@@ -29,7 +29,7 @@ def make_tsv_output(topics_file, topic_names_file, output_file, num_topics=10):
 				continue
 			elif i == 1:
 				article_name = os.path.split(line_split[i])[1]
-				output_text += article_name.decode('utf-8')
+				output_text += article_name
 			elif i % 2 == 0:
 				topic_name = topic_names_dict[line_split[i]]
 			elif i % 2 == 1:
