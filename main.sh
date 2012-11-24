@@ -68,10 +68,16 @@ then
 	mkdir -p $MALLET_ROOT/lowernostop-stem
 	RAW_DATA=$MALLET_ROOT/lowernostop/data.mallet
 	STEM_DATA=$MALLET_ROOT/lowernostop-stem/data.mallet
-	$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop \
-	--keep-sequence --output $RAW_DATA --token-regex '[\p{L}\p{M}]+'
-	$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop-stem \
-	--keep-sequence --output $STEM_DATA --token-regex '[\p{L}\p{M}]+'
+	if [ ! -e $RAW_DATA ]
+	then
+		$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop \
+		--keep-sequence --output $RAW_DATA --token-regex '[\p{L}\p{M}]+'
+	fi
+	if [ ! -e $STEM_DATA ]
+	then
+		$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop-stem \
+		--keep-sequence --output $STEM_DATA --token-regex '[\p{L}\p{M}]+'
+	fi
 
 	for NUM_TOPICS in 10 30 50 200
 	do	
@@ -79,16 +85,22 @@ then
 		mkdir -p $RAW_ROOT
 		STEM_ROOT=$MALLET_ROOT/lowernostop-stem/$NUM_TOPICS
 		mkdir -p $STEM_ROOT
-		$MALLET_BIN_DIR/mallet train-topics --input $RAW_DATA --num-topics $NUM_TOPICS \
-		--output-state $RAW_ROOT/state.gz \
-		--output-doc-topics $RAW_ROOT/doc-topic-proportions.txt \
-		--output-topic-keys $RAW_ROOT/topic-keys.txt \
-		--num-top-words $NUM_TOP_WORDS
-		$MALLET_BIN_DIR/mallet train-topics --input $STEM_DATA --num-topics $NUM_TOPICS \
-		--output-state $STEM_ROOT/state.gz \
-		--output-doc-topics $STEM_ROOT/doc-topic-proportions.txt \
-		--output-topic-keys $STEM_ROOT/topic-keys.txt \
-		--num-top-words $NUM_TOP_WORDS
+		if [ ! \( \( -e $RAW_ROOT/topic-keys.txt \) -a \( -e $RAW_ROOT/doc-topic-proportions.txt \) -a \( -e $RAW_ROOT/state.gz \) \) ]
+		then
+			$MALLET_BIN_DIR/mallet train-topics --input $RAW_DATA --num-topics $NUM_TOPICS \
+			--output-state $RAW_ROOT/state.gz \
+			--output-doc-topics $RAW_ROOT/doc-topic-proportions.txt \
+			--output-topic-keys $RAW_ROOT/topic-keys.txt \
+			--num-top-words $NUM_TOP_WORDS
+		fi
+     	if [ ! \( \( -e $STEM_ROOT/topic-keys.txt \) -a \( -e $STEM_ROOT/doc-topic-proportions.txt \) -a \( -e $STEM_ROOT/state.gz \) \) ]
+		then
+			$MALLET_BIN_DIR/mallet train-topics --input $STEM_DATA --num-topics $NUM_TOPICS \
+			--output-state $STEM_ROOT/state.gz \
+			--output-doc-topics $STEM_ROOT/doc-topic-proportions.txt \
+			--output-topic-keys $STEM_ROOT/topic-keys.txt \
+			--num-top-words $NUM_TOP_WORDS
+		fi
 	done
 	fi
 fi
