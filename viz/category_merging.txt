@@ -1,0 +1,26 @@
+cricket	sports	explorers
+generic	music/rock	film/tv
+music	sports	film/tv
+
+merging:
+
+eng: 
+	sports = cricket+sports
+	royalty.religion = royalty + church.royalty
+
+fra:
+	literature = literature...other
+	music = music+orchestra
+	family = family.life
+	royalty.religion = royalty + church.royalty
+
+spa:
+	music = music.orchestra + music.rock
+	military = war.ancient
+	royalty.religion = empire.religion + royalty
+	politics = politics.art
+
+common cateogries:
+literature	family	 music	royalty.religion	politics	military
+
+
