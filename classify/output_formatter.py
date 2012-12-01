@@ -10,7 +10,7 @@ def make_tsv_output(topics_file, topic_names_file, output_file, num_topics=10):
 			continue
 		# Topics name file format:
 		# topicnum topicname
-		topic_num = line.split()[0]
+		topic_num = int(line.split()[0])
 		topic_name = ' '.join(line.split()[1:])
 		topic_names_dict[topic_num] = topic_name
 
@@ -20,7 +20,7 @@ def make_tsv_output(topics_file, topic_names_file, output_file, num_topics=10):
 	# add top line
 	output_text = 'Name'
 	for i in range(num_topics):
-		output+text += '\t' + topic_names_dict[i]
+		output_text += '\t' + topic_names_dict[i]
 	output_text += '\n'
 	topics_f = open(topics_file, 'r')
 
@@ -42,12 +42,12 @@ def make_tsv_output(topics_file, topic_names_file, output_file, num_topics=10):
 				pass
 				#topic_name = topic_names_dict[line_split[i]]
 			elif i % 2 == 1:
-				topic_props_dict[line_split[i-1]] = line_split[i]
+				topic_props_dict[int(line_split[i-1])] = line_split[i]
 				#output_text += '\t' + topic_name + ',' + line_split[i]
 
 		# print topic_props_dict
 		for i in range(num_topics):
-			output_text += topic_props_dict[i] + '\t'
+			output_text += '\t' + topic_props_dict[i]
 		output_text += '\n'
 	output_f.write(output_text)
 

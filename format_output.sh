@@ -4,7 +4,7 @@
 
 if [ $# -lt 3 ]
 then
-	echo "Usage: ./main.sh lang processingname numtopics, e.g. fr lowernostop-stem 30"
+	echo "Usage: ./format_output.sh lang processingname numtopics, e.g. fr lowernostop-stem 30"
 else
 
 	LANG=$1
