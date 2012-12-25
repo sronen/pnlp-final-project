@@ -6,12 +6,14 @@ Hacky adaptation of a script I wrote to augment Freebase's person.tsv file with 
 Wikipedia pageid and name for each person listed.
 
 Input files available under datasets/wikipedia_bios_lists. Results are also stored there.
+The output file uses \t to separate edtiions and || to separate langcode from article name.
 NOTE: script must be run from same folder as data and wiki_article_meta.py.
 
-TODO: results needs to be merged later using the shell script merge_files.sh,
-or simply: 
-cat person*_matched.tsv | grep -v "date_of_birth" > all_person_matched.tsv
-("date_of_birth" used to identify the headers if these exist, grep -v removes them)
+TODO: results needs to be merged later using: 
+cat person*_matched.tsv > all_person_matched.tsv
+If for some reason a header is to each file added, use:
+cat person*_matched.tsv | grep -v "string that exists only in the header" > all_person_matched.tsv
+And add the header to the merged file
 '''
 
 import os, sys          # Command-line arguments, etc.
@@ -98,14 +100,15 @@ def convert_person_tsv(infile, outfile, errorfile, chunk_number, header_row):
 				row_text = ""
 				# Add Wikipedia article name to dict
 				for lang, name_in_lang in lang_dic.iteritems():
-				 	row_text += "%s,%s\t" % (lang, name_in_lang)
+				 	row_text += "%s||%s\t" % (lang, name_in_lang)
 
 				# Now convert to a string and write it
 				unicode_row = row_text.encode('utf-8')
 				fout.write( unicode_row + "\n")
 				name_found += 1
 			except KeyError:
-				# Errors are handled by wiki_article_meta, so this shouldn't happen
+				# TODO: Errors are handled by wiki_article_meta, so this shouldn't happen
+				# find better way to track errors
 				print ">>> No English Wikipedia article for %s : %s" % (row['id'], row['name'])
 				name_not_found += 1
 
