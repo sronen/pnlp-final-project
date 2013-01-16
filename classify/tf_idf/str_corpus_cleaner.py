@@ -105,9 +105,6 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	# Remove Stopwords.
 	terms = remove_stopwords(language, terms, stopwords_file)
 
-	# Remove stopwords again, post-lemmatization/stemming
-	#terms = remove_stopwords(language, terms, stopwords_file)
-
 	return terms
 
 def lemmatize_or_stem(language, terms):
@@ -119,14 +116,7 @@ def lemmatize_or_stem(language, terms):
 		stemmer = FrenchStemmer()
 		terms = map(lambda term: stemmer.stem(term), terms)
 	elif language == 'spanish':
-		""" Use snowball stemmer: deprecated
-		from nltk.stem.snowball import SpanishStemmer
-		stemmer = SpanishStemmer()
-		terms = map(lambda term: stemmer.stem(term), terms)
-		"""
-
-		""" Use FreeLing
-		"""
+		# Use FreeLing
 		analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/FreeLing/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		terms = map(lambda term: term.encode('utf-8'), terms)
 		analyzeProcess.stdin.write(' '.join(terms))
@@ -146,8 +136,6 @@ def lemmatize_or_stem(language, terms):
 					terms.append(lemma)
 				
 		terms = map(lambda term: term.decode('utf-8'), terms)
-
-		# cat Adolfo_Farsari | analyze -f /usr/local/share/FreeLing/config/es.cfg
 	return terms
 
 def remove_stopwords(language, terms, stopwords_file):
@@ -156,6 +144,7 @@ def remove_stopwords(language, terms, stopwords_file):
 	if stopwords_file == None:
 		STOPWORDS = set(stopwords.words(language))
 	else:
+		# Currently, this path gets taken by Spanish and French, but not English.
 		STOPWORDS = set()
 		f = open(stopwords_file, 'r')
 		for line in f.readlines():
@@ -164,6 +153,13 @@ def remove_stopwords(language, terms, stopwords_file):
 				continue
 			word = split[0]
 			STOPWORDS.add(word)
+
+	# for spanish, add all english stopwords too
+	if language == 'spanish':
+		for word in stopwords.words('english'):
+			STOPWORDS.add(word)
+
+
 	"""if language == 'en':
 		STOPWORDS = set(stopwords.words('english'))
 	elif language == 'fr':
@@ -193,6 +189,7 @@ def create_category_file(root_path, category_name, clean_root_path=None, lem_fla
 	
 	category_path = os.path.join(root_path, category_name)
 	document_list = corpus_os.get_items_in_folder(category_path)
+	print document_list
 	
 	folder_terms = []
 	
@@ -278,6 +275,7 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 	
 	
 	for i, doc in enumerate(articles):
+		print doc
 		# Get all terms in article (repetitions must be preserved!)
 		try:
 			fin = codecs.open(os.path.join(corpus_root, doc), 'rU')
