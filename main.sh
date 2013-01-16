@@ -46,7 +46,8 @@ then
 	python $RETRIEVE_DIR/article_cleaner.py $DATASETS_DIR/$LANG/plain $DATASETS_DIR/$LANG/clean $END_INDICATORS
 fi
 
-
+# the second "n" in the next two commands signals that we don't want to just blindly remove every capitalized word.
+# we can change it to "y" if we would like to do that.
 if [ ! -e $DATASETS_DIR/$LANG/lowernostop ]
 then
 	echo "running lowernostop str_corpus_cleaner"
