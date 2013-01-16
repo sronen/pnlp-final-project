@@ -9,6 +9,7 @@ import string
 
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
+import subprocess
 
 # These are the NLTK English stopwords
 #STOPWORDS = set(['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'])
@@ -29,7 +30,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
 
 def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords_file='None'):
 	'''
-	Clean the passed string an return the remaining words as a list of terms.
+	Clean the passed string and return the remaining words as a list of terms.
 	Removes punctuation, possessives, too-short words, stopwords,
 	and numbers. 
 	Adapted from DataIAP 2012 by Adam Marcus and Eugene Wu,
@@ -39,6 +40,20 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	# TODO: cleaning should be done in a single pass for efficiecy.
 	# But this is simpler...
 	st = s.decode('utf-8')
+
+	terms = st.split()
+	orig_st = st
+
+	"""Lemmatizing before doing any processing ensures the best named entity recognition."""
+	# Lemmatize words if chosen
+	if lemmatize==True:
+		terms = lemmatize_or_stem(language, terms)
+	if len(terms) == 0:
+		print 'EXCEPTION'
+		print ' '.join(terms)
+		return []
+
+	st = ' '.join(terms)
 
 	# Remove numbers (" \d+"), English possesives ("['s? ]") , and punctuation, in this order
 	#st = re.sub("\d+|\'s|[:;,?!#$%()\'\"\.]\| - ", "", s.decode('utf-8'), re.UNICODE)
@@ -50,29 +65,36 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	# Remove punctuation and digits: list chars to delete
 	to_delete = u'!"#%\'()*+,–-./:;<=>?@[\]^_`’{|}~'+string.digits
 #	st = translate_non_alphanumerics(st, u' ', to_delete) # replace with space
-	st = translate_non_alphanumerics(st, u' ', to_delete) # replace with space
+	try:
+		st = translate_non_alphanumerics(st, u' ', to_delete) # replace with space
+	except:
+		print 'EXCEPTION'
+		return []
+		print st
+#		print orig_st.encode('utf-8')
 
-
-	orig_terms = st.split()
+	terms = st.split()
 
 	# NE removal approximation:
 	# Remove ALL capitalized words
 	if decap==True:
-		terms = filter(lambda term: term[0].islower(), orig_terms)
-	else:
-		terms = orig_terms
+		terms = filter(lambda term: term[0].islower(), terms)
 
-	'''
-	# Remove capitalized words not at the beginning of a sentence
-	terms = []
-	prev_term = "." # allows us to get the first word in the article
-	for term in orig_terms:
-		if term[0].islower() or prev_term[-1]==".":
-			# only add lowercase words or any words after a period
-			# print "ADDED: term: %s, Prev term %s" % (term, prev_term) # Debug printouts
-			terms.append(term)
-		prev_term = term
-	'''
+	# # Remove capitalized words not at the beginning of a sentence
+	# terms = []
+	# prev_term = "." # allows us to get the first word in the article
+	# for term in orig_terms:
+	# 	if term[0].islower() or prev_term[-1]==".":
+	# 		# only add lowercase words or any words after a period
+	# 		# print "ADDED: term: %s, Prev term %s" % (term, prev_term) # Debug printouts
+	# 		terms.append(term)
+	# 	prev_term = term
+
+	"""Lemmatizing before converting to lowercase makes sense if we are doing
+	named entity recognition."""
+	# Lemmatize words if chosen
+	#if lemmatize==True:
+	#	terms = lemmatize_or_stem(language, terms)"""
 
 	# Convert to lowercase
 	terms = map(lambda term: term.lower(), terms)
@@ -83,12 +105,8 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	# Remove Stopwords.
 	terms = remove_stopwords(language, terms, stopwords_file)
 
-	# Lemmatize words if chosen
-	if lemmatize==True:
-		terms = lemmatize_or_stem(language, terms)
-
 	# Remove stopwords again, post-lemmatization/stemming
-	terms = remove_stopwords(language, terms, stopwords_file)
+	#terms = remove_stopwords(language, terms, stopwords_file)
 
 	return terms
 
@@ -101,9 +119,35 @@ def lemmatize_or_stem(language, terms):
 		stemmer = FrenchStemmer()
 		terms = map(lambda term: stemmer.stem(term), terms)
 	elif language == 'spanish':
+		""" Use snowball stemmer: deprecated
 		from nltk.stem.snowball import SpanishStemmer
 		stemmer = SpanishStemmer()
 		terms = map(lambda term: stemmer.stem(term), terms)
+		"""
+
+		""" Use FreeLing
+		"""
+		analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/FreeLing/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+		terms = map(lambda term: term.encode('utf-8'), terms)
+		analyzeProcess.stdin.write(' '.join(terms))
+		stdout, stderr = analyzeProcess.communicate()
+		# Parse FreeLing output
+		# Lemma is always second word of each line.
+		terms = list()
+		lines = stdout.split('\n')
+		for line in lines:
+			items = line.split(' ')
+			if len(items) == 4:
+				lemma = items[1]
+				tag = items[2]
+
+				# remove proper nouns, punctuation, numbers, and dates/times
+				if not (tag[0:2]=='NP' or tag[0] == 'F' or tag[0] == 'Z' or tag[0] == 'W'):
+					terms.append(lemma)
+				
+		terms = map(lambda term: term.decode('utf-8'), terms)
+
+		# cat Adolfo_Farsari | analyze -f /usr/local/share/FreeLing/config/es.cfg
 	return terms
 
 def remove_stopwords(language, terms, stopwords_file):
