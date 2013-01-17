@@ -32,7 +32,7 @@ def get_wiki_sizes(lang_edition, article_titles):
 	Given a language edition and a list of Wikipedia pageids, returns a dictionary 
 	of key=wpid (i.e., page id) and value=size of article. Also returns a list of 
 	articles that weren't found.
-	REST query: http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=Jerry%20Seinfeld|Charles%20Darwin&rvprop=size&redirects=
+	REST query: http://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=Jerry%20Seinfeld|Charles%20Darwin&rvprop=size
 	TODO: work with WPID: http://en.wikipedia.org/w/api.php?action=query&pageids=19162933|1326810&format=json
 	'''
 
