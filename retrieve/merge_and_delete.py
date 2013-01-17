@@ -1,6 +1,6 @@
 import os
 
-ORIG_FILE =  "parallel_eng_spa_new_test.tsv"
+ORIG_FILE =  "parallel_eng_spa_new.tsv"
 OUTPUT_TITLE = "name_eng\tname_spa\twiki_size_eng\twiki_size_spa"
 ERROR_TITLE = "titles that made the query fail:"
 TOTALS_TITLE = "Chunk\tTotal\tok_eng\tbad_eng\tok_spa\tbad_spa"

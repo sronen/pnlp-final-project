@@ -2,9 +2,11 @@
 
 '''
 Module for finding the sizes for Wikipedia biographies in English and Spanish.
-TODO: results needs to be merged later using the merge_and_delete_files.py;
+Results need to be merged later using the merge_and_delete_files.py;
 Merging could also be done by this very script, but better synchronization
 of processes will be necessary. 
+
+# TODO: check input files for duplicates.
 '''
 
 import os, sys	# Command-line arguments, etc.
@@ -15,7 +17,7 @@ from itertools import islice
 from collections import defaultdict
 import multiprocessing
 
-BIO_LIST_FILE = "parallel_eng_spa_new_test.tsv"
+BIO_LIST_FILE = "parallel_eng_spa_new.tsv"
 SPLIT_SIZE = 10000 # size for each file chunk, def. 20MB
 
 MAX_WIKI_QUERIES = 50 # maximum number of IDs Wikipedia allows in a single query
@@ -61,13 +63,17 @@ def get_wiki_sizes(lang_edition, article_titles):
 			wiki_sizes_dict[article_name.encode('utf-8')] = -1
 			continue
 	
-	if (len(wiki_sizes_dict)==49 and lang_edition==WIKIPEDIA_ENG_API_URL):
-		for wpid, pageinfo in results['query']['pages'].iteritems():
-			print pageinfo['title'], pageinfo['revisions'][0]['size']
-		print "****************"
+	# Code used to figure out the difference between 'total' and 'ok'+'bad'.
+	# I found the input file contained some duplicates, and that whenever
+	# some of the duplicates were in the same chunk, Wikipedia only returned
+	# results for one. 
+	# if (len(wiki_sizes_dict)==49 and lang_edition==WIKIPEDIA_ENG_API_URL):
+	# 	for wpid, pageinfo in results['query']['pages'].iteritems():
+	# 		print pageinfo['title'], pageinfo['revisions'][0]['size']
+	# 	print "****************"
 
-		for title in article_titles:
-			print title
+	# 	for title in article_titles:
+	# 		print title
 
 	return wiki_sizes_dict, not_found_list
 
