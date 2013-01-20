@@ -17,18 +17,19 @@ from itertools import islice
 from collections import defaultdict
 import multiprocessing
 import re
+import shutil
 
-BIO_LIST_FILE = "test_.tsv"
-SPLIT_SIZE = 10000 # size for each file chunk, def. 20MB
+SPLIT_SIZE = 500 # size for each file chunk, def. 20MB
 
-MAX_WIKI_QUERIES = 50 # maximum number of IDs Wikipedia allows in a single query
+# NOTE: not used
+# MAX_WIKI_QUERIES = 50 # maximum number of IDs Wikipedia allows in a single query
 
  # use Wikipedia Edition language code, e.g., 'en' or 'de' 
 WIKIPEDIA_ENG_API_URL = 'http://en.wikipedia.org/w/api.php'
 WIKIPEDIA_SPA_API_URL = 'http://es.wikipedia.org/w/api.php'
 #ACTIVE_LANG_EDITION = WIKIPEDIA_ES_API_URL
 
-def get_specific_wikipedia_article(article_title, language='en'):  
+def get_specific_wikipedia_article(article_title, language='en', really_plain_text=False):  
     """
     Gets a specific wikipedia article, given the url.
     Note: you should really pass the title if you are working with non-English.
@@ -36,7 +37,7 @@ def get_specific_wikipedia_article(article_title, language='en'):
     try:
     	article_title_escaped = article_title.replace(" ", "%20") # works better
         article_extract_url = \
-            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s' % \
+            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s&explaintext=' % \
             (language, article_title_escaped)
         # adding &explaintext= produces really clean text...
 
@@ -55,7 +56,7 @@ def get_specific_wikipedia_article(article_title, language='en'):
     
     try:
         article_text = re.search(r'<extract.*?>(.*)</extract', article_xml_response, flags=re.DOTALL).group(1)
-        fout = open(article_title.replace(" ", "_") + "_" + language, "w")
+        fout = open(language + "/" + article_title.replace(" ", "_") + "_" + ".txt", "w")
         fout.write(article_text + "\n")
         fout.close()
         return True
@@ -166,6 +167,19 @@ def dl_orchestrator(infile, outfile, errorfile, totalsfile, chunk_number, header
 
 	st_time = time.time()
 
+	# Create a folder for each language. There are nicer ways to do it...
+	try:
+		os.mkdir('en')
+	except OSError:
+		# file exists
+		shutil.rmtree('en')
+		os.mkdir('en')
+	try:
+		os.mkdir('es')
+	except OSError:
+		# file exists
+		shutil.rmtree('es')
+		os.mkdir('es')
 
 	while True:
 		# To speed queries, we read several lines from the file each time.
@@ -173,7 +187,10 @@ def dl_orchestrator(infile, outfile, errorfile, totalsfile, chunk_number, header
 		# first on FB then on Wikipedia; this reduces the number of slow
 		# API hits. MAX_WIKI_QUERIES is the maximum number of IDs Wikipedia
 		# allows in one query
-		next_n_lines = list(islice(dr, MAX_WIKI_QUERIES))
+		#next_n_lines = list(islice(dr, MAX_WIKI_QUERIES))
+		# NOTE: no point slicing this, the entire chunk could fit in memory
+		# and queries are ran one by one anyway.
+		next_n_lines = list(dr)
 		
 		if not next_n_lines:
 			break
@@ -281,7 +298,7 @@ def multiprocess_it(function_to_parallelize, origfile):
 
 if __name__ == "__main__":
 
-
+	bio_list_file = sys.argv[1]
 	st_time = time.time()
-	multiprocess_it(dl_orchestrator, BIO_LIST_FILE)
+	multiprocess_it(dl_orchestrator, bio_list_file)
 	print "time: ", time.time() - st_time
