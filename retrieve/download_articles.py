@@ -55,7 +55,7 @@ def get_specific_wikipedia_article(article_title, language='en', really_plain_te
     
     try:
         article_text = re.search(r'<extract.*?>(.*)</extract', article_xml_response, flags=re.DOTALL).group(1)
-        fout = open(language + "/" + article_title.replace(" ", "_") + "_" + ".txt", "w")
+        fout = open(language + "/" + article_title.replace(" ", "_") + ".txt", "w")
         fout.write(article_text + "\n")
         fout.close()
         return True
