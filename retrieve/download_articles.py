@@ -27,7 +27,6 @@ SPLIT_SIZE = 500 # size for each file chunk, def. 20MB
  # use Wikipedia Edition language code, e.g., 'en' or 'de' 
 WIKIPEDIA_ENG_API_URL = 'http://en.wikipedia.org/w/api.php'
 WIKIPEDIA_SPA_API_URL = 'http://es.wikipedia.org/w/api.php'
-#ACTIVE_LANG_EDITION = WIKIPEDIA_ES_API_URL
 
 def get_specific_wikipedia_article(article_title, language='en', really_plain_text=False):  
     """
@@ -167,20 +166,6 @@ def dl_orchestrator(infile, outfile, errorfile, totalsfile, chunk_number, header
 
 	st_time = time.time()
 
-	# Create a folder for each language. There are nicer ways to do it...
-	try:
-		os.mkdir('en')
-	except OSError:
-		# file exists
-		shutil.rmtree('en')
-		os.mkdir('en')
-	try:
-		os.mkdir('es')
-	except OSError:
-		# file exists
-		shutil.rmtree('es')
-		os.mkdir('es')
-
 	while True:
 		# To speed queries, we read several lines from the file each time.
 		# We get the FB IDs from these lines and query them all at once,
@@ -259,6 +244,7 @@ def dl_orchestrator(infile, outfile, errorfile, totalsfile, chunk_number, header
 
 def multiprocess_it(function_to_parallelize, origfile):
 	# read file
+	st_time = time.time()
 	forig = open(origfile, "rU")
 
 	# split to SPLIT_SIZE chunks
@@ -295,10 +281,27 @@ def multiprocess_it(function_to_parallelize, origfile):
 		i+=1 
 
 	forig.close()
+	print "time: ", time.time() - st_time
 
 if __name__ == "__main__":
 
 	bio_list_file = sys.argv[1]
-	st_time = time.time()
+
+	# Create a folder for each language. There are nicer ways to do it...
+	
+	english_dir = 'en'
+	if not os.path.exists(english_dir):
+		os.mkdir(english_dir)
+	else:
+		shutil.rmtree(english_dir, ignore_errors=True)
+		os.mkdir(english_dir)
+	
+	spanish_dir = 'es'
+	if not os.path.exists(spanish_dir):
+		os.mkdir(spanish_dir)
+	else:
+		shutil.rmtree(spanish_dir, ignore_errors=True)
+		os.mkdir(spanish_dir)
+	
+
 	multiprocess_it(dl_orchestrator, bio_list_file)
-	print "time: ", time.time() - st_time
