@@ -1,6 +1,5 @@
-import os
+import os, sys
 
-ORIG_FILE =  "parallel_eng_spa_new.tsv"
 OUTPUT_TITLE = "name_eng\tname_spa\twiki_size_eng\twiki_size_spa"
 ERROR_TITLE = "titles that made the query fail:"
 TOTALS_TITLE = "Chunk\tTotal\tok_eng\tbad_eng\tok_spa\tbad_spa"
@@ -26,10 +25,12 @@ def merge_files(orig_file, suffix, header_row):
 
 
 if __name__ == "__main__":
-	root, ext = os.path.splitext(ORIG_FILE)
-	merge_files(ORIG_FILE, "output", OUTPUT_TITLE)
-	merge_files(ORIG_FILE, "error", ERROR_TITLE)
-	merge_files(ORIG_FILE, "totals", TOTALS_TITLE)
+	orig_file = sys.argv[1]
+
+	root, ext = os.path.splitext(orig_file)
+	#merge_files(orig_file, "output", OUTPUT_TITLE)
+	merge_files(orig_file, "error", ERROR_TITLE)
+	merge_files(orig_file, "totals", TOTALS_TITLE)
 
 	# delete all remainaing temp files
-	os.system("rm %s%s" % ("_*", ext) )
+	os.system("rm %s%s%s%s" % ('_', root , '*',ext) )
