@@ -36,7 +36,7 @@ def get_specific_wikipedia_article(article_title, language='en', really_plain_te
     try:
     	article_title_escaped = article_title.replace(" ", "%20") # works better
         article_extract_url = \
-            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s&explaintext=' % \
+            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s' % \
             (language, article_title_escaped)
         # adding &explaintext= produces really clean text...
 
@@ -55,7 +55,7 @@ def get_specific_wikipedia_article(article_title, language='en', really_plain_te
     
     try:
         article_text = re.search(r'<extract.*?>(.*)</extract', article_xml_response, flags=re.DOTALL).group(1)
-        fout = open(language + "/" + article_title.replace(" ", "_") + "_" + ".txt", "w")
+        fout = open(language + "/" + article_title.replace(" ", "_") + ".txt", "w")
         fout.write(article_text + "\n")
         fout.close()
         return True
