@@ -36,7 +36,7 @@ def get_specific_wikipedia_article(article_title, language='en', really_plain_te
     try:
     	article_title_escaped = article_title.replace(" ", "%20") # works better
         article_extract_url = \
-            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s&explaintext=' % \
+            'http://%s.wikipedia.org/w/api.php?action=query&format=xml&prop=extracts&titles=%s' % \
             (language, article_title_escaped)
         # adding &explaintext= produces really clean text...
 
