@@ -27,24 +27,33 @@ def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, conso
         os.makedirs(target_dir)
 
     listing = os.listdir(src_dir)
-    for subdir in listing:
-        if not os.path.isdir(src_dir + '/' + subdir):
-            continue
-        if not consolidate_folders:
-            if not os.path.exists(target_dir + '/' + subdir):
-                os.mkdir(target_dir + '/' + subdir)
-        
-        files = os.listdir(src_dir + '/' + subdir)
-        for filename in files:
-            orig_text = open(src_dir + '/' + subdir + '/' + filename).read().decode('utf-8')
-            
-            new_text = clean_plaintext_article(orig_text, False, end_indicators_file).encode('utf-8')
-            if consolidate_folders:
-                f = open(target_dir + '/' + filename, 'w')
-            else:
-                f = open(target_dir + '/' + subdir + '/' + filename, 'w')
-            f.write(new_text)
-            
+    for subdir in listing: # This could either be a category folder, or an individual file.
+        if os.path.isdir(src_dir + '/' + subdir):
+            # We are in the setup where we have src_dir/category_dir/file
+            process_subdir(target_dir, src_dir, subdir)
+        elif subdir[-4:] == '.txt':
+            # We are in the setup where we have src_dir/file, and "subdir" are actually the files
+            process_file(src_dir + '/' + subdir, target_dir + '/' + subdir, end_indicators_file)
+
+
+def process_subdir(target_dir, src_dir, subdir, end_indicators_file):
+    if not consolidate_folders:
+        if not os.path.exists(target_dir + '/' + subdir):
+            os.mkdir(target_dir + '/' + subdir)
+    
+    files = os.listdir(src_dir + '/' + subdir)
+    for filename in files:
+        if consolidate_folders:
+            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + filename)
+        else:
+            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + subdir + '/' + filename)
+
+def process_file(file_path, target_path, end_indicators_file):
+        orig_text = open(file_path).read().decode('utf-8')
+        new_text = clean_plaintext_article(orig_text, False, end_indicators_file).encode('utf-8')
+        f = open(target_path, 'w')
+        f.write(new_text)
+        f.close()
 
                 
 if __name__=='__main__':

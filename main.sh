@@ -1,63 +1,96 @@
 #!/bin/bash
 
+#####
+# Parallel corpus instructions
+#
+# python retrieve/article_cleaner.py datasets/parallel_corpora/parallel_corpus/par_corpus_xml/en datasets/parallel_corpora/parallel_corpus/par_corpus_clean/en datasets/en/end_indicators.txt
+# python retrieve/filter_article_sizes.py -> generate the ultimate list of articles you want to use, article_list.txt
+# python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS
+#
+#####
+
 # Copy this script to the project root.
 # ./main.sh english en
 # ./main.sh french fr
 # ./main.sh spanish es
+
+# ./main.sh english en y both_5kb.txt
 
 if [ $# -lt 2 ]
 then
 	echo "Usage: ./main.sh language-name wiki-language-code [run-mallet=y/n, default:y]"
 else
 
+PARALLEL_CORPUS=1 # 0
+
 # PARAMS
 LANGUAGE=$1
 LANG=$2
-if [ $# -eq 3 ]
+if [ $# -gt 2 ]
 then
 	RUN_MALLET=$3
 else
 	RUN_MALLET=y
 fi
+if [ $# -eq 4 ]
+then
+	ARTICLE_LIST=$4
+else
+	ARTICLE_LIST=both_5kb.txt
+fi
 NUM_TOP_WORDS=100
 MALLET_BIN_DIR='/Applications/mallet-2.0.7/bin'
 CLASSIFY_DIR='classify'
 RETRIEVE_DIR='retrieve'
-DATASETS_DIR='datasets'
+if [ $PARALLEL_CORPUS -eq 1 ]
+then
+	DATASETS_DIR='datasets/par_corpus'
+else
+	DATASETS_DIR='datasets'
+fi
 ENGLISH_DATA_DIR='plaintext_featured_bios'
 END_INDICATORS="$DATASETS_DIR/$LANG/end_indicators.txt"
-if [ -e "$DATASETS_DIR/$LANG/stopwords.txt" ];
+if [ -e "datasets/$LANG/stopwords.txt" ];
 then
-	STOPWORDS="$DATASETS_DIR/$LANG/stopwords.txt"
+	STOPWORDS="datasets/$LANG/stopwords.txt"
+else
+	STOPWORDS=n
 fi
 
-
-# Download articles
-if [ ! -e $DATASETS_DIR/$LANG/plain ]
+if [ $PARALLEL_CORPUS -eq 0 ]
 then
-	echo "downloading articles"
-	python $RETRIEVE_DIR/featured_article_downloader.py $DATASETS_DIR/$ENGLISH_DATA_DIR $DATASETS_DIR/$LANG/plain $LANG
-fi
+	# Download articles
+	if [ ! -e $DATASETS_DIR/$LANG/plain ]
+	then
+		echo "downloading articles"
+		python $RETRIEVE_DIR/featured_article_downloader.py $DATASETS_DIR/$ENGLISH_DATA_DIR $DATASETS_DIR/$LANG/plain $LANG
+	fi
 
-# Clean articles
-if [ ! -e $DATASETS_DIR/$LANG/clean ]
-then
-	echo "running article article_cleaner"
-	python $RETRIEVE_DIR/article_cleaner.py $DATASETS_DIR/$LANG/plain $DATASETS_DIR/$LANG/clean $END_INDICATORS
-fi
+	# Clean articles
+	if [ ! -e $DATASETS_DIR/$LANG/clean ]
+	then
+		echo "running article article_cleaner"
+		python $RETRIEVE_DIR/article_cleaner.py $DATASETS_DIR/$LANG/plain $DATASETS_DIR/$LANG/clean $END_INDICATORS
+	fi
 
-# the second "n" in the next two commands signals that we don't want to just blindly remove every capitalized word.
-# we can change it to "y" if we would like to do that.
-if [ ! -e $DATASETS_DIR/$LANG/lowernostop ]
-then
-	echo "running lowernostop str_corpus_cleaner"
-	python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop n n $LANGUAGE y $STOPWORDS
+	# the second "n" in the next two commands signals that we don't want to just blindly remove every capitalized word.
+	# we can change it to "y" if we would like to do that.
+	if [ ! -e $DATASETS_DIR/$LANG/lowernostop ]
+	then
+		echo "running lowernostop str_corpus_cleaner"
+		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop n n $LANGUAGE y $STOPWORDS
+	fi
 fi
 
 if [ ! -e $DATASETS_DIR/$LANG/lowernostop-stem ]
 then
 	echo "running lowernostop-stem str_corpus_cleaner"
-	python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS
+	if [ $PARALLEL_CORPUS -eq 0 ]
+	then
+		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS
+	else
+		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS $DATASETS_DIR/$ARTICLE_LIST
+	fi
 fi
 
 if [ $RUN_MALLET == "y" ]
@@ -65,15 +98,15 @@ then
 	echo "running mallet"
 	# Run mallet
 	MALLET_ROOT=$DATASETS_DIR/$LANG/mallet
-	mkdir -p $MALLET_ROOT/lowernostop
+	#mkdir -p $MALLET_ROOT/lowernostop
 	mkdir -p $MALLET_ROOT/lowernostop-stem
-	RAW_DATA=$MALLET_ROOT/lowernostop/data.mallet
+	#RAW_DATA=$MALLET_ROOT/lowernostop/data.mallet
 	STEM_DATA=$MALLET_ROOT/lowernostop-stem/data.mallet
-	if [ ! -e $RAW_DATA ]
-	then
-		$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop \
-		--keep-sequence --output $RAW_DATA --token-regex '[\p{L}\p{M}]+'
-	fi
+	# if [ ! -e $RAW_DATA ]
+	# then
+	# 	$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop \
+	# 	--keep-sequence --output $RAW_DATA --token-regex '[\p{L}\p{M}]+'
+	# fi
 	if [ ! -e $STEM_DATA ]
 	then
 		$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop-stem \
@@ -82,18 +115,18 @@ then
 
 	for NUM_TOPICS in 10 30 50 200
 	do	
-		RAW_ROOT=$MALLET_ROOT/lowernostop/$NUM_TOPICS
-		mkdir -p $RAW_ROOT
+		# RAW_ROOT=$MALLET_ROOT/lowernostop/$NUM_TOPICS
+		# mkdir -p $RAW_ROOT
 		STEM_ROOT=$MALLET_ROOT/lowernostop-stem/$NUM_TOPICS
 		mkdir -p $STEM_ROOT
-		if [ ! \( \( -e $RAW_ROOT/topic-keys.txt \) -a \( -e $RAW_ROOT/doc-topic-proportions.txt \) -a \( -e $RAW_ROOT/state.gz \) \) ]
-		then
-			$MALLET_BIN_DIR/mallet train-topics --input $RAW_DATA --num-topics $NUM_TOPICS \
-			--output-state $RAW_ROOT/state.gz \
-			--output-doc-topics $RAW_ROOT/doc-topic-proportions.txt \
-			--output-topic-keys $RAW_ROOT/topic-keys.txt \
-			--num-top-words $NUM_TOP_WORDS
-		fi
+		# if [ ! \( \( -e $RAW_ROOT/topic-keys.txt \) -a \( -e $RAW_ROOT/doc-topic-proportions.txt \) -a \( -e $RAW_ROOT/state.gz \) \) ]
+		# then
+		# 	$MALLET_BIN_DIR/mallet train-topics --input $RAW_DATA --num-topics $NUM_TOPICS \
+		# 	--output-state $RAW_ROOT/state.gz \
+		# 	--output-doc-topics $RAW_ROOT/doc-topic-proportions.txt \
+		# 	--output-topic-keys $RAW_ROOT/topic-keys.txt \
+		# 	--num-top-words $NUM_TOP_WORDS
+		# fi
      	if [ ! \( \( -e $STEM_ROOT/topic-keys.txt \) -a \( -e $STEM_ROOT/doc-topic-proportions.txt \) -a \( -e $STEM_ROOT/state.gz \) \) ]
 		then
 			$MALLET_BIN_DIR/mallet train-topics --input $STEM_DATA --num-topics $NUM_TOPICS \

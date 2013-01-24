@@ -107,7 +107,7 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	#if decap==True:
 	# NE removal approximation:
 	# Remove ALL capitalized words
-	if not ENGLISH_FREELING:
+	if language=='english' and not ENGLISH_FREELING:
 		terms = filter(lambda term: term[0].islower(), terms)
 
 	# Convert to lowercase
@@ -161,13 +161,13 @@ def lemmatize_or_stem(language, terms):
 				# remove proper nouns, punctuation, numbers, and dates/times
 				if not (tag[0:2]=='NP' or tag[0] == 'F' or tag[0] == 'Z' or tag[0] == 'W' or tag[0:3] == 'POS'):
 					# if english, need to remove numbers
-
 					include = True
 					for num in NUMBERS:
 						if num in lemma:
 							include = False
 					if include:
-						terms += lemma
+						terms.append(lemma)
+		terms = map(lambda term: term.decode('utf-8'), terms)
 
 	elif (language == 'english' and not ENGLISH_FREELING):
 	 	lem = WordNetLemmatizer()
@@ -291,7 +291,8 @@ def create_corpus_files(corpus_root, corpus_name=None, lem_flag=True, decap_flag
 
 
 def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True, 
-								language='english', make_new_dir=False, stopwords_file=None):
+								language='english', make_new_dir=False, stopwords_file=None,
+								article_list_file=None):
 	'''
 	Create a file for each article with only clean tokens.
 	-Input: path of corpus root, name of sub-folder to create and place files
@@ -302,7 +303,14 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 	'''
 	st_time = time.time()
 	
-	articles = corpus_os.get_items_in_folder(corpus_root)
+	if article_list_file == None:
+		articles = corpus_os.get_items_in_folder(corpus_root)
+	else:
+		f = open(article_list_file, 'r')
+		articles = f.read().split('\n')
+		f.close()
+		print 'Number of articles in ' +  article_list_file + ':', len(articles)
+
 	if make_new_dir:
 		clean_root = corpus_name
 	else:
@@ -373,9 +381,13 @@ if __name__ == "__main__":
 	except IndexError:
 		make_new_dir=False
 	try:
-		stopwords_file = sys.argv[7]
+		stopwords_file = sys.argv[7] if sys.argv[7] != 'n' else None
 	except IndexError:
 		stopwords_file = None
+	try:
+		article_list_file = sys.argv[8]
+	except IndexError:
+		article_list_file = None
 	
 	num_docs = create_corpus_files_separate(corpus_root, 
 											corpus_name, 
@@ -383,7 +395,8 @@ if __name__ == "__main__":
 											decap_flag=decap_flag, 
 											language=language,
 											make_new_dir=make_new_dir,
-											stopwords_file=stopwords_file)
+											stopwords_file=stopwords_file,
+											article_list_file=article_list_file)
 	#path of corpus root, name of sub-folder to create and place files
 	# in, flag that indicates whether words should be lemmatized
 	
