@@ -113,7 +113,8 @@ then
 		--keep-sequence --output $STEM_DATA --token-regex '[\p{L}\p{M}]+'
 	fi
 
-	for NUM_TOPICS in 10 30 50 200
+	#for NUM_TOPICS in 10 30 50 200
+	for NUM_TOPICS in 30
 	do	
 		# RAW_ROOT=$MALLET_ROOT/lowernostop/$NUM_TOPICS
 		# mkdir -p $RAW_ROOT

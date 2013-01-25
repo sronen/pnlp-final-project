@@ -1,4 +1,4 @@
-import sys, re, string, time, os, pickle
+import sys, re, string, time, os, pickle, random, shutil
 
 def make_article_size_lists(src_dir, file_1kb, file_5kb):
     list_1kb = list()
@@ -36,9 +36,88 @@ def combine_article_lists(file1, file2, intersection_file):
     f3.write('\n'.join(list(intersection_set)))
     f3.close()
 
+def make_train_test_split(orig_file, train_file, test_file, src_dir, train_dir, test_dir):
+    # 60% train, 40% test
+    f = open(orig_file, 'r')
+    names = f.read().split('\n')
+    f.close()
+
+    random.shuffle(names)
+
+    train_names = names[:int(len(names)*.6)]
+    test_names = names[int(len(names)*.6):]
+
+    # Write down the splits
+    f_train = open(train_file, 'w')
+    f_train.write('\n'.join(train_names))
+    f_train.close()
+
+    f_test = open(test_file, 'w')
+    f_test.write('\n'.join(test_names))
+    f_test.close()
+
+    # Create train and test folders
+    if not os.path.exists(train_dir):
+        os.makedirs(train_dir)
+
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+
+    # Actually copy the files into train and test dirs
+    for name in train_names:
+        shutil.copy(src_dir + '/' + name, train_dir + '/' + name)
+
+    for name in test_names:
+        shutil.copy(src_dir + '/' + name, test_dir + '/' + name)
+
+def make_crossval_split(orig_file, file_prefix, src_dir, crossval_dir, k):
+    """TODO"""
+    """
+    orig_file is the file with the list of all article names (both_5kb.txt)
+    file_prefix is the prefix to use for the crossval file names
+    src_dir is the root dir for where all the actual article content lives
+    crossval_dir is the dir to put
+    k is number of folds
+    """
+    # 60% train, 40% test
+    f = open(orig_file, 'r')
+    names = f.read().split('\n')
+    f.close()
+
+    random.shuffle(names)
+
+    train_names = names[:int(len(names)*.6)]
+    test_names = names[int(len(names)*.6):]
+
+    # Write down the splits
+    f_train = open(train_file, 'w')
+    f_train.write('\n'.join(train_names))
+    f_train.close()
+
+    f_test = open(test_file, 'w')
+    f_test.write('\n'.join(test_names))
+    f_test.close()
+
+    # Create train and test folders
+    if not os.path.exists(train_dir):
+        os.makedirs(train_dir)
+
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+
+    # Actually copy the files into train and test dirs
+    for name in train_names:
+        shutil.copy(src_dir + '/' + name, train_dir + '/' + name)
+
+    for name in test_names:
+        shutil.copy(src_dir + '/' + name, test_dir + '/' + name)
+
                 
 if __name__=='__main__':
-    if len(sys.argv) > 4 and sys.argv[4] == 'combine':
+    if sys.argv[1] == 'split':
+        # all under datasets/par_corpus, both_5kb.txt, both_5kb_train.txt, both_5kb_test.txt, en/lowernostop-stem, en/5kbtrain, en/5kbtest
+        make_train_test_split(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+    elif len(sys.argv) > 4 and sys.argv[4] == 'combine':
         combine_article_lists(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
         make_article_size_lists(sys.argv[1], sys.argv[2], sys.argv[3])
