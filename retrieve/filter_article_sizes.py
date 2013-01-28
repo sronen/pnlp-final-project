@@ -37,6 +37,22 @@ def combine_article_lists(file1, file2, intersection_file):
     f3.close()
 
 def make_train_test_split(orig_file, train_file, test_file, src_dir, train_dir, test_dir):
+    """
+    Assume:
+    orig_file: both_5kb.txt
+    train_file: both_5kb_train.txt
+    test_file: both_5kb_test.txt
+    src_dir: lowernostop-stem -> en/lowernostop-stem + es/lowernostop-stem
+    train_dir: 5kbtrain -> en/5kbtrain + es/5kbtrain
+    test_dir: 5kbtest -> en/5kbtest + es/5kbtest
+    """
+    en_src_dir = 'en/' + src_dir
+    es_src_dir = 'es/' + src_dir
+    en_train_dir = 'en/' + train_dir
+    es_train_dir = 'es/' + train_dir
+    en_test_dir = 'en/' + test_dir
+    es_est_dir = 'es/' + test_dir
+
     # 60% train, 40% test
     f = open(orig_file, 'r')
     names = f.read().split('\n')
@@ -56,12 +72,9 @@ def make_train_test_split(orig_file, train_file, test_file, src_dir, train_dir, 
     f_test.write('\n'.join(test_names))
     f_test.close()
 
-    # Create train and test folders
-    if not os.path.exists(train_dir):
-        os.makedirs(train_dir)
-
-    if not os.path.exists(test_dir):
-        os.makedirs(test_dir)
+    for cur_dir in [en_train_dir, en_test_dir, es_train_dir, es_test_dir]:
+        if not os.path.exists(cur_dir):
+            os.makedirs(cur_dir)
 
     # Actually copy the files into train and test dirs
     for name in train_names:

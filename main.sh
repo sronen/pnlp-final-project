@@ -6,7 +6,12 @@
 # python retrieve/article_cleaner.py datasets/parallel_corpora/parallel_corpus/par_corpus_xml/en datasets/parallel_corpora/parallel_corpus/par_corpus_clean/en datasets/en/end_indicators.txt
 # python retrieve/filter_article_sizes.py -> generate the ultimate list of articles you want to use, article_list.txt
 # python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS
+# /Applications/mallet-2.0.7/bin/mallet import-dir --input en/5kb_train_test_split/5kbtrain --keep-sequence --output en/5kb_train_test_split/5kbmallet/5kbtrain_data.mallet --token-regex '[\p{L}\p{M}]+'
+# /Applications/mallet-2.0.7/bin/mallet train-topics --input en/5kb_train_test_split/5kbmallet/5kbtrain_data.mallet --num-topics 30 --output-state en/5kb_train_test_split/5kbmallet/state.gz --output-doc-topics en/5kb_train_test_split/5kbmallet/doc-topic-proportions.txt --output-topic-keys en/5kb_train_test_split/5kbmallet/topic-keys.txt --num-top-words 100 --inferencer-filename en/5kb_train_test_split/5kbmallet/inferencer.mallet
 #
+# /Applications/mallet-2.0.7/bin/mallet import-dir --input en/5kb_train_test_split/5kbtest --keep-sequence --output en/5kb_train_test_split/5kbmallet/5kbtest_data.mallet --token-regex '[\p{L}\p{M}]+' --use-pipe-from en/5kb_train_test_split/5kbmallet/5kbtrain_data.mallet 
+# /Applications/mallet-2.0.7/bin/mallet infer-topics --input en/5kb_train_test_split/5kbmallet/5kbtest_data.mallet --output-doc-topics en/5kb_train_test_split/5kbmallet/test-doc-topic-proportions.txt --inferencer en/5kb_train_test_split/5kbmallet/inferencer.mallet
+# 
 #####
 
 # Copy this script to the project root.
@@ -96,6 +101,8 @@ fi
 if [ $RUN_MALLET == "y" ]
 then
 	echo "running mallet"
+
+	FOLDERNAME=lowernostop-stem
 	# Run mallet
 	MALLET_ROOT=$DATASETS_DIR/$LANG/mallet
 	#mkdir -p $MALLET_ROOT/lowernostop
