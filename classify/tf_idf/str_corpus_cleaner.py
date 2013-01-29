@@ -307,7 +307,11 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 		articles = corpus_os.get_items_in_folder(corpus_root)
 	else:
 		f = open(article_list_file, 'r')
-		articles = f.read().split('\n')
+		lines = f.read().split('\n')
+		if language == 'english':
+			articles = map(lambda line: line.split('\t')[0], lines)
+		elif language=='spanish':
+			articles = map(lambda line: line.split('\t')[1], lines)
 		f.close()
 		print 'Number of articles in ' +  article_list_file + ':', len(articles)
 
