@@ -1,0 +1,30 @@
+0	Literature
+1	Art: painting, photography, architecture
+2	Sports: racing, football
+3	Sports: boxing, wresting
+4	War & Military
+5	TV & Film: mostly TV
+6	[]
+7	[Hispanic culture]
+8	Life: Medical (and homosexuality!)
+9	Science: mostly natural sciences, looks somewhat 19th cent.
+10	Science & Technology
+11	Music: popular
+12	[Life]
+13	Law & Crime
+14	TV & Film: mostly Film
+15	Sports: mostly Olympics?
+16	Music: popular, more jazz than pop
+17	Politics & Gov't
+18	[Life: Career?]
+19	Religion/Church
+20	[Life?]
+21	Life: family (mostly)
+22	Politics & Gov't
+23	[Life?: community/NGO?]
+24	Royalty/History
+25	[Philosophy?]
+26	Sports
+27	Music: classical
+28	Travel/Exploration
+29	Life: Career

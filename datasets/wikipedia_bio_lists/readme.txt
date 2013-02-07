@@ -1,7 +1,7 @@
 # datasets/wikipedia_bio_lists
 
 Folder Contents:
-parallel_eng_spa_sizes_unique.tsv, with ~116k entries, is the final file.
+parallel_eng_spa_sizes_clean.tsv, with ~116k entries, is the final file.
 
 - people_on_english_wikipedia: 
 	a) person_wiki.tsv.zip: list of people retrived from Freebase, 
