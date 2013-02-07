@@ -1,0 +1,30 @@
+0	Literature
+1	Art
+2	Sports
+3	Sports
+4	War & Military
+5	TV & Film
+6	[]
+7	[Hispanic culture]
+8	Personal life
+9	Science & Technology
+10	Science & Technology
+11	Music
+12	[]
+13	Law & Crime
+14	TV & Film
+15	Sports
+16	Music
+17	Politics & Gov't
+18	[]
+19	Religion/Church
+20	Personal life (career)
+21	Personal life (family)
+22	Politics & Gov't
+23	Personal life (community/recognition)
+24	Royalty
+25	Humanities & Philosophy
+26	Sports
+27	Music
+28	Travel/Exploration
+29	Personal life (career)

@@ -10,7 +10,7 @@
 9	Science: mostly natural sciences, looks somewhat 19th cent.
 10	Science & Technology
 11	Music: popular
-12	[Life]
+12	[]
 13	Law & Crime
 14	TV & Film: mostly Film
 15	Sports: mostly Olympics?
@@ -21,9 +21,9 @@
 20	[Life?]
 21	Life: family (mostly)
 22	Politics & Gov't
-23	[Life?: community/NGO?]
+23	Life: career/achievements
 24	Royalty/History
-25	[Philosophy?]
+25	[Philosophy? Academia?]
 26	Sports
 27	Music: classical
 28	Travel/Exploration
