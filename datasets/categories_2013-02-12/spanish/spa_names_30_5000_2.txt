@@ -1,0 +1,30 @@
+0	Media
+1	Science
+2	[Hispanic topics?]
+3	Sports (boxing)
+4	Sports
+5	War and Military
+6	Sports
+7	Business / Tech. / Aviation
+8	Science (natural)
+9	Humanities & Social Sciences
+10	[French words?]
+11	Art
+12	Royalty (personal life)
+13	[]? life
+14	Law and crime
+15	[]
+16	Literature and Theater
+17	[] nationalities 
+18	Music
+19	[royalty / war]
+20	personal life [Note: proper nouns like US, UK not removed]
+21	[] revolution
+22	Religion (catholicism)
+23	Media
+24	Sports
+25	Popular culture
+26	[german]
+27	Politcs and Govt
+28	Music
+29	?

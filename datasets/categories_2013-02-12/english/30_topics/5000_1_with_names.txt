@@ -1,0 +1,30 @@
+0	Politics & Gov't
+1	Sports (racing)
+2	Music (popular)
+3	Science (physics and math)
+4	[would time could...] 
+5	Law & Crime
+6	War & Military
+7	Humanities & Social Sciences & Philosophy
+8	Science (nautral sciences)
+9	Media (TV + pop culutre + life)
+10	Politcs & Gov't
+11	Literature, also Comics
+12	Royalty, war?
+13	Media : film
+14	Life (mosty Family; with some royalty)
+15	[Mostly French words]
+16	Religion (Catholicism)
+17	Sports
+18	Literature
+19	[German and Spanish words]
+20	Life (Family)
+21	Life (Education, Career, some bias towards academia)
+22	Sports
+23	Sports
+24	Exploration / Teavel
+25	Music (classical)
+26	Business
+27	[name century also...]
+28	[said would one...]
+29	Art

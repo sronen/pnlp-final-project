@@ -1,0 +1,30 @@
+0	Music (classical)
+1	Art
+2	[Science? mostly German words]
+3	Exploration / Travel
+4	[would time could...]
+5	Life (Education, Career, some bias towards academia)
+6	Science
+7	Business
+8	Military & War (some politics)
+9	Law & Crime
+10	Sports (boxing/westling)
+11	Sports
+12	[name century also...]
+13	War & Military
+14	Politics & Gov't
+15	Life (of nobility...)
+16	Sports
+17	[said would one...]
+18	[Spanish and French words]
+19	Music (popular)
+20	Science (Medical?)
+21	Relgiion (Catholicism)
+22	Media: Film & TV
+23	Sports
+24	Life (family)
+25	Literature
+26	Media: Popular culture, celebs
+27	Media: TV
+28	Sports
+29	Humanities & Philosophy

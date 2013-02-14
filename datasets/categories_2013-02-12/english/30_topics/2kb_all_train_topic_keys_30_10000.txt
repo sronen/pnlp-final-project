@@ -1,0 +1,30 @@
+0	War & Military
+1	Sports (racing, baseball)
+2	Humanities
+3	Life (family)
+4	Science (natural sciences)
+5	Sports (basketball, football)
+6	Politics & Gov't
+7	Royalty / War / Politics - maybe Politics & Gov't (Historical) or Personal Life of Royalty
+8	Art
+9	Aviation (technology? warfae?)
+10	Media: personal life?
+11	Media: film & TV
+12	[Spanish]
+13	[German & French]
+14	Religion
+15	[would time could...]
+16	Personal life (with some royalty)
+17	Law & Crime
+18	Literature (criticism and history)
+19	Music (popular)
+20	[name also country...]
+21	Science (math, physics, atsro...)
+22	Media? [said would show]
+23	Music (popular)
+24	Lietrature (popular, incl. comics)
+25	Sports
+26	Politics & Gov't
+27	Music (classical)
+28	Life (Education? Academia?)
+29	Business

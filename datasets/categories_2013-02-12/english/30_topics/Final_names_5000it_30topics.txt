@@ -1,0 +1,30 @@
+0	Music
+1	Art
+2	[]
+3	Exploration / Travel
+4	[]
+5	Education
+6	Science
+7	Business
+8	Warfare & Military
+9	Law & Crime
+10	Sports (boxing/westling)
+11	Sports
+12	[]
+13	Warfare & Military
+14	Politics & Gov't
+15	Personal life (royalty)
+16	Sports
+17	[]
+18	[]
+19	Music
+20	Science
+21	Relgiion (Catholicism)
+22	Media
+23	Sports
+24	Personal life
+25	Literature
+26	Popular culture
+27	Media
+28	Sports
+29	Humanities & Philosophy
