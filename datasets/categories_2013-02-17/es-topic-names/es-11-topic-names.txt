@@ -1,0 +1,30 @@
+0	Art
+1	Sports
+2	Humanities
+3	Royalty
+4	Explorers
+5	Media
+6	[hispanic world]
+7	Royalty
+8	[french?]
+9	Science (tech, aviation)
+10	Law
+11	Politics
+12	[]
+13	Music
+14	Warfare
+15	Business
+16	Politics
+17	Literature
+18	Education
+19	[Medicine + far east?]
+20	Personal
+21	Sports
+22	Personal
+23	Media
+24	Music
+25	Religion
+26	[german?]
+27	Sports
+28	Science
+29	[history]

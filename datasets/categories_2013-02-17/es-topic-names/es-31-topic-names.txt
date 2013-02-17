@@ -1,0 +1,30 @@
+0	Humanities
+1	Politics
+2	Warfare
+3	Art
+4	Sports
+5	Education
+6	[]
+7	[far east?]
+8	Royalty
+9	Politics
+10	Personal
+11	Royalty
+12	[]
+13	Business
+14	Sports
+15	Sports
+16	Sports
+17	Personal
+18	Literature
+19	Science
+20	Music
+21	[french]
+22	[old empires]
+23	Law
+24	Religion
+25	Music
+26	[hispanic world]
+27	[german]
+28	Media
+29	Media	

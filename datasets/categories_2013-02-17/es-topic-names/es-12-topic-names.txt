@@ -1,0 +1,30 @@
+0	Personal
+1	Science
+2	Royalty
+3	Sports
+4	Politics
+5	Music
+6	Sports
+7	Royalty
+8	[hispanic word]
+9	Religion
+10	[french]
+11	[german]
+12	Sports
+13	[]
+14	Explorers
+15	Media
+16	Music
+17	Media
+18	Literature
+19	[ancient history]
+20	Warfare
+21	Politics
+22	Law
+23	Personal
+24	Science
+25	Art
+26	Humanities
+27	Sports
+28	Business
+29	Education

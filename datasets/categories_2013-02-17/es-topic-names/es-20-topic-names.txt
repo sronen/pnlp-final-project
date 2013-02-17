@@ -1,0 +1,30 @@
+0	[hispanic world]
+1	Literature
+2	[ancient history]
+3	Personal
+4	Religion
+5	Sports
+6	Education
+7	Music
+8	Royalty (war)
+9	Art
+10	Politics
+11	Politics
+12	Music
+13	Warfare
+14	[]
+15	Sports
+16	Explorers
+17	[]
+18	Law
+19	Sports
+20	Music
+21	Science
+22	Sports
+23	Humanities
+24	Media
+25	Sports
+26	[too much German]
+27	Media
+28	Royalty (family)
+29	Personal

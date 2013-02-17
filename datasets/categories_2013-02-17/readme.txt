@@ -1,4 +1,4 @@
-We use one word names for categories. Text in parentheses is not part of the category's name. 
+We use one word names for categories. Text in parentheses is not part of the category's name. In alphabetical order: 
 
 Art	(incl. architecure)
 Business
@@ -6,7 +6,7 @@ Education	(students and professors, incl. academia)
 Explorers
 Humanities	(and social sciences)
 Law	(and crime)
-Literature
+Literature	(and journalism)
 Media	(incl. TV, film, popular culture such as reality or celebrity news -- hard to distinguish)
 Music	(popular and classical)
 Personal
@@ -29,5 +29,10 @@ topic-prop: proportions of topics for each article, topics identified by number
 topic-prop-names: proportions of topics for each article, topics identified by name
 
 Notes:
-1) In en-21, topic 24, which combines Literature and Media (mostly animation) was ingnored.
-2) In en-20, topic 9, which classified architecture with Science and not with Art, was ignored.
+1) en-21, topic 24, which combines Literature and Media (mostly animation) was ingnored.
+2) en-20, topic 9, in which architecture is bundled with Science and not with Art, was ignored.
+3) es-12, topics 23,29 and es-22 topic 27: classified as Personal despite some doubts (words like Cielo (=sky), colors, etc.). There were other occurences as well.
+4) en-21 topic 22: ignored - balanced combination of business and technology.
+5) en-30 topic 21: classified as "Warfare"; moslty about vehicles (aircraft, ships, cars) for what seems like military use.
+
+
