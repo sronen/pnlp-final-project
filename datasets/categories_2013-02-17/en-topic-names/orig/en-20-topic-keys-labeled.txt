@@ -1,0 +1,30 @@
+0	[]
+1	Media
+2	Law and crime
+3	Waefare and military
+4	Literature
+4	[]
+6	Music
+7	Art
+8	Science and Tech
+9	Science and tech (+architecture)
+10	Education
+11	Media
+12	Sports
+13	Sports
+14	Politics and govt	
+15	Humanities and Social Sciences
+16	[]
+17	Sports
+18	[]
+19	Music
+20	Music
+21	Literature
+22	Personal life
+23	Sports
+24	Science and Tech (medicine and aviation)
+25	[german]
+26	Royalty (politics)
+27	Religion
+28	Sports
+29	Business

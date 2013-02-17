@@ -1,0 +1,30 @@
+0	Law and crime
+1	Explorers
+2	Music
+3	[]
+4	[german]
+5	[]
+6	[]
+7	Education
+8	Royalty (personal)
+9	Sports
+10	[]
+11	Sports
+12	Media
+13	Royalty (war)
+14	Warfare
+15	Media
+16	Sports
+17	Business
+18	Art
+19	Humanities and Soc Sci
+20	Politics
+21	Sports
+22	Sports
+23	Politics
+24	Literaure
+25	[spanish]
+26	Personal life
+27	Music
+28	Science and Tech
+29	Religion

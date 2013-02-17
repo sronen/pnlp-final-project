@@ -1,0 +1,30 @@
+0	Royalty (poltics/war)
+1	[french words]
+2	Royalty (life)
+3	Media
+4	Art (inc. architecture)
+5	Science and Tech
+6	Explorers
+7	Personal life
+8	Sports
+9	Literature
+10	Music (popular)
+11	Religion (Cath.)
+12	Politics and govt (revolutions)
+13	Popular culture
+14	[]
+15	Sports
+16	Humanities and Soc. Sci
+17	Warfare and military
+18	[german]
+19	[]
+20	Sports
+21	Education
+22	Science and Tech
+23	Music
+24	Politics and govt
+25	[]
+26	Law and crime
+27	Sports
+28	Literature
+29	[spanish]

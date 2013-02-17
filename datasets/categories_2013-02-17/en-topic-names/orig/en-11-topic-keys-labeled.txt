@@ -1,0 +1,30 @@
+0	Personal life
+1	Sports
+2	[spanish]
+3	Sports
+4	[german]
+5	Sports
+6	Law and crime
+7	Royalty (war)
+8	Business
+9	Music
+10	Humanitieis and Soc. Sci
+11	Education
+12	Politics and govt
+13	Music
+14	[]
+15	Science and Tech
+16	Warfare and military
+17	Literature
+18	Media
+19	Policis and govt (revolution)
+20	Music
+21	Art (+arch)
+22	Religion (cath.)
+23	Sports
+24	Royalty (life)
+25	Sports
+26	[french]
+27	[]
+28	Popular culture
+29	Media

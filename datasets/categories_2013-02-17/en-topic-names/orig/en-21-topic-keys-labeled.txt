@@ -1,0 +1,30 @@
+0	[]
+1	Personal life
+2	Education
+3	[german]
+4	Sports
+5	Music
+6	Art (+archi.)
+7	Humanities and Soc Sci
+8	[spanish]
+9	[]
+10	Law and crime
+11	Politics
+12	Warfare and military
+13	[]
+14	[]
+15	Media (pop culutre)
+16	Msuic
+17	Explorers
+18	Sports
+19	Warfare and military (aircraft and ships)
+20	Literature
+21	Politics
+22	Royalty (personal)
+23	Sports
+24	Literature + Media (animation)
+25	Media
+26	Sports
+27	Business
+28	Sports
+29	Religion
