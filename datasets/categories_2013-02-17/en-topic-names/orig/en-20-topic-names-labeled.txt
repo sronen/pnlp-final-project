@@ -1,0 +1,30 @@
+0	Law
+1	Literature
+2	Explorers / Travel
+3	Royalty (military)
+4	Literature + animation
+5	Art
+6	Music
+7	Warfare
+8	[German]
+9	Personal
+10	Religion
+11	Sports
+12	Science
+13	Sports
+14	Media
+15	Business
+16	Sports
+17	Sports
+18	Music
+19	Media
+20	[]
+21	[Spanish]
+22	Education
+23	Humanities
+24	Sports
+25	Politics
+26	Royalty (personal)
+27	[]
+28	Science
+29	[]

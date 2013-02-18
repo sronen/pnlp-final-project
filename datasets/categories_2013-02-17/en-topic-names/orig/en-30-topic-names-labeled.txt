@@ -1,0 +1,30 @@
+0	Education
+1	Warfare
+2	Warfare (aircraft)
+3	[history]
+4	Sports
+5	Explorers
+6	Humanities
+7	[]
+8	Media
+9	Sports
+10	Personal
+11	Science
+12	Literature + animation?
+13	Sports
+14	Music
+15	Music
+16	Sports
+17	[]
+18	Royalty
+19	Business
+20	Politcs
+21	[]
+22	Media
+23	Literature
+24	Religion
+25	Politics
+26	Media
+27	? ?? Personal? Literature?
+28	Art
+29	Law

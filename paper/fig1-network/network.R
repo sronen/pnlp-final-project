@@ -1,7 +1,8 @@
-library(igraph)
-#import the sample_weighted_adjmatrix file from bottom of the page:
+#### Set working directoy to script directory! ####
 
-EDGE.THRESHOLD <- 0.03
+library(igraph)
+
+EDGE.THRESHOLD <- 0.02
 
 load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") {
   # Load adjacency matrix
@@ -51,16 +52,18 @@ load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") 
     
        edge.color = rgb(.2, .2, .7, ewidth/15),
        edge.width = ewidth, # discrete values     
-       edge.arrow.size = ewidth*0.2,
+       edge.arrow.size = ewidth*0.3,
        edge.curved = 0.2, # to show reciprocal edges
   )
 } 
 
+#### MAIN ####
+
 #svg("english_topic_network.svg")
 par(oma=c(0,0,0,0), mar=c(0,0,0,0))
-#load.visualize.network("en_network.txt", "en_category_count.txt", vcolor="cornflowerblue")
+load.visualize.network("en_network_matrix.txt", "en_category_count.txt", vcolor="cornflowerblue")
 #dev.off()
 
-svg("spanish_topic_network.svg")
-load.visualize.network("es_network.txt", "es_category_count.txt", vcolor="darksalmon")
-dev.off()
+#svg("spanish_topic_network.svg")
+load.visualize.network("es_network_matrix.txt", "es_category_count.txt", vcolor="darksalmon")
+#dev.off()

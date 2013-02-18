@@ -10,10 +10,11 @@ import json # for pretty printing
 AVERAGE = True # output average topic composition (instead of total)
 ARTICLE_NAME = ""
 
-infile = '../../datasets/categories_2013-02-17/es-topics-full.txt'
-net_matrix_outfile = 'es_network_matrix.txt' # adjacency matrix
-net_edgelist_outfile = 'es_network_edgelist.txt' # for CytoScape
-cat_outfile = 'es_category_count.txt'
+langcode = "es" ###### SELECT YOUR LANGUAGE ######
+infile = '../../datasets/categories_2013-02-17/%s-article-topics-full.txt' % langcode
+net_matrix_outfile = '%s_network_matrix.txt' % langcode # adjacency matrix
+net_edgelist_outfile = '%s_network_edgelist.txt' % langcode # for CytoScape
+cat_outfile = '%s_category_count.txt' % langcode
 
 fin = open(infile, "rU")
 dr = csv.DictReader(fin, delimiter="\t")
