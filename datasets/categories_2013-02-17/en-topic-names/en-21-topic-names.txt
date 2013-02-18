@@ -8,7 +8,7 @@
 7	Humanities
 8	[spanish]
 9	[]
-10	Law and crime
+10	Law
 11	Politics
 12	Warfare
 13	[]

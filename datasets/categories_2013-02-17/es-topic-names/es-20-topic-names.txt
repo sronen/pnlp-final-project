@@ -6,7 +6,7 @@
 5	Sports
 6	Education
 7	Music
-8	Royalty (war)
+8	Royalty
 9	Art
 10	Politics
 11	Politics
@@ -26,5 +26,5 @@
 25	Sports
 26	[too much German]
 27	Media
-28	Royalty (family)
+28	Royalty
 29	Personal

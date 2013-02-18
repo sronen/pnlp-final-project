@@ -3,6 +3,11 @@
 Folder Contents:
 parallel_eng_spa_sizes_clean.tsv, with ~116k entries, is the final file.
 
+- wikipedia_bio_lists:
+	a) featured_bios_eng.txt and _spa: list of Featured Biographies for these languages, compiled from each languages Featured Articles page.
+	b) wiki2012_top_bios_eng.txt and _spa: list of biographical articles among the 100 most viewed articles in the these languages (http://toolserver.org/~johang/2012.html)
+	c) featured_bios_categories_eng.txt and spa: list of categories for each language
+
 - people_on_english_wikipedia: 
 	a) person_wiki.tsv.zip: list of people retrived from Freebase, 
 	and their matching English Wikipedia names and ID.

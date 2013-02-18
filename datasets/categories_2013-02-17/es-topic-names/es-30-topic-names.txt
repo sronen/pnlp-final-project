@@ -14,7 +14,7 @@
 13	[foreign words, nationalities]
 14	Business
 15	Sports
-16	Royalty (personal)
+16	Royalty
 17	[]
 18	Science
 19	Sports

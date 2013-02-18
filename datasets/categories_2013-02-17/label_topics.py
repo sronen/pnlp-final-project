@@ -108,8 +108,7 @@ def get_final_topics(infile, convertfile, outfile):#, langcode):
 
 if __name__ == "__main__":
 	FILE_NUMBERS = [10, 11, 12, 20, 21, 22, 30, 31, 32]
-	#LANGCODES = ['en', 'es']
-	LANGCODES = ['es']
+	LANGCODES = ['en', 'es']
 
 	TOPIC_FILENAME = "%s-topic-prop/%s-%s-topic-prop.txt"
 	MAP_FILENAME = "%s-topic-names/%s-%s-topic-names.txt"
