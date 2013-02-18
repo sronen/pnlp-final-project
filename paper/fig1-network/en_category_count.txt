@@ -1,0 +1,14 @@
+Category	Num_articles
+Life	175
+Literature	508
+Art	302
+Business_and_economics	56
+TV_and_film	752
+Sports	698
+Law_and_crime	252
+War_and_military	203
+Science_and_technology	426
+Music	948
+Politics	614
+Exploration	106
+Popular_culture	38
