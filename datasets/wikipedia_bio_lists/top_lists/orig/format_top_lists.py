@@ -16,7 +16,8 @@ Convert it to a table of this format:
 The script is heavily dependent on the format!
 '''
 
-CATEGORY_INDICATORS = ["biographies", "Biographies"]
+CATEGORY_INDICATORS = ["biographies", "Biographies", 
+	"biographies of ", "Biographies of "]
 
 
 def convert_bio_list(infile, outfile, sep):
@@ -24,6 +25,8 @@ def convert_bio_list(infile, outfile, sep):
 	fout = open(outfile, "w")
 	fout.write("Article\tWikiCategory\n")
 
+	### TODO: this script may generate an extra space at the end
+	### of each line!!! Verify this.
 	for line in fin:
 		# note that the iterator is incremented within the loop as well...
 		cat_title =  line.strip()
@@ -48,7 +51,7 @@ def convert_bio_list(infile, outfile, sep):
 		try:
 			next(fin)
 		except StopIteration:
-			print "Probably done!"
+			print "Probably done! Make sure there's no unnecessary whitespace!"
 
 	fout.close()
 	fin.close()

@@ -107,12 +107,18 @@ def get_final_topics(infile, convertfile, outfile):#, langcode):
 
 
 if __name__ == "__main__":
-	FILE_NUMBERS = [10, 11, 12, 20, 21, 22, 30, 31, 32]
+	#FILE_NUMBERS = [10, 11, 12, 20, 21, 22, 30, 31, 32]
+	#LANGCODES = ['en', 'es']
+
+	# For the missing featured articles
+	FILE_NUMBERS = [10, 20, 30]
 	LANGCODES = ['en', 'es']
 
-	TOPIC_FILENAME = "%s-topic-prop/%s-%s-topic-prop.txt"
+	#TOPIC_FILENAME = "%s-topic-prop/%s-%s-topic-prop.txt"
+	TOPIC_FILENAME = "%s-topic-prop/%s-%s-topic-prop-fa.txt" # Feat. Artic.
 	MAP_FILENAME = "%s-topic-names/%s-%s-topic-names.txt"
-	OUTPUT_FILENAME = "%s-topic-prop-names/%s-%s-topic-prop-names.txt"
+	#OUTPUT_FILENAME = "%s-topic-prop-names/%s-%s-topic-prop-names.txt"
+	OUTPUT_FILENAME = "%s-topic-prop-names/%s-%s-topic-prop-names-fa.txt" # Feat. Artic.
 	OUTPUT_DIR = "%s-topic-prop-names/"
 
 	for lang in LANGCODES:

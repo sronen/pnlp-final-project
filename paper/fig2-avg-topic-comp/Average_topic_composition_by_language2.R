@@ -1,16 +1,24 @@
 library(reshape)
 library(ggplot2)
 
-postscript("avg_topic_compo.eps")
+postscript("avg_topic_compo2.eps")
 
-# Load DF and assign rownames
-eng.topic.df <- read.csv("outfile_en.txt", sep = "\t", header=T)
-rownames(eng.topic.df) <- eng.topic.df[,1]
-eng.topic.df[,1] <- NULL
+load.topics.df <- function(filename) {
+  # Load DF and assign rownames
+  topic.df <- read.csv(filename,sep = "\t", header=T, quote="") # quote="", otherwise row are not properly loaded
+  rownames(topic.df) <- topic.df[,1]
+  topic.df[,1] <- NULL
+  return(topic.df)
+}
 
-spa.topic.df <- read.csv("outfile_es.txt", sep = "\t", header=T)
-rownames(spa.topic.df) <- spa.topic.df[,1]
-spa.topic.df[,1] <- NULL
+eng.topic.df <- load.topics.df("../../datasets/categories_2013-02-17/en-article-topics-full.txt")
+spa.topic.df <- load.topics.df("../../datasets/categories_2013-02-17/es-article-topics-full.txt")
+
+# spa.topic.df <- read.csv("../../datasets/categories_2013-02-17/en-article-topics-full.txt", 
+#                          sep = "\t", header=T)
+# rownames(spa.topic.df) <- spa.topic.df[,1]
+#spa.topic.df[,1] <- NULL
+### SETWD to script dir ###
 
 # Merge
 topic.aggr <- data.frame( colnames(eng.topic.df), 
@@ -41,5 +49,7 @@ p <- ggplot( dfm, aes(x=Topic, y=Percentage)) +
   theme(axis.text.y = element_text(face="bold", colour="#000000", size=16)) + # change axis label font size
   coord_flip()
 print(p)
+
+print("DONE!")
 
 dev.off()

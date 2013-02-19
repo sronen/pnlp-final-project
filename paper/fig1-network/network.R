@@ -37,6 +37,8 @@ load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") 
   # Find the average share of the category (=most prominent topic) among
   # article in that category, and its complement to 1.
   shares.of.max.topics <- lapply( dat, function(x) c(max(x), 1-max(x)) ) #, 1-max(x)) )
+  print(net.file)
+  print(shares.of.max.topics)
   
   plot(good.graf,
        #vertex.label = paste(as.character(V(graf)$name), "\n", cat.count$Num_articles),
@@ -59,11 +61,11 @@ load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") 
 
 #### MAIN ####
 
-#svg("english_topic_network.svg")
+svg("english_topic_network.svg")
 par(oma=c(0,0,0,0), mar=c(0,0,0,0))
 load.visualize.network("en_network_matrix.txt", "en_category_count.txt", vcolor="cornflowerblue")
-#dev.off()
+dev.off()
 
-#svg("spanish_topic_network.svg")
+svg("spanish_topic_network.svg")
 load.visualize.network("es_network_matrix.txt", "es_category_count.txt", vcolor="darksalmon")
-#dev.off()
+dev.off()
