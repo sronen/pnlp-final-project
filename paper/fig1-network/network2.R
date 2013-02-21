@@ -1,3 +1,4 @@
+# With centrality measures
 #### Set working directoy to script directory! ####
 
 library(igraph)
@@ -5,6 +6,8 @@ library(igraph)
 EDGE.THRESHOLD <- 0.02
 
 load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") {
+  # Returns centrality measures
+  
   # Load adjacency matrix
   dat <- read.csv(net.file, sep='\t',header=TRUE,
                   row.names=1, check.names=FALSE) # read .csv file
@@ -25,7 +28,7 @@ load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") 
   # Remove "Other" and "TOTAL"
   cat.count <- subset(cat.count, row.names(cat.count)!="TOTAL")
   cat.count <- subset(cat.count, row.names(cat.count)!="Other")
-  
+    
   # Remove edges under given weight
   bad.edges <- E(graf)[E(graf)$weight<EDGE.THRESHOLD]
   good.graf <- delete.edges(graf, bad.edges)
@@ -51,22 +54,36 @@ load.visualize.network <- function(net.file, cat.file, vcolor="cornflowerblue") 
   
        vertex.shape="pie",
        vertex.pie=shares.of.max.topics,
-       vertex.pie.color=list(c(vcolor, "white")),
+       vertex.pie.color=list(c(vcolor, "lightgray")),
     
-       edge.color = rgb(.1, .1, .1, ewidth/12),
-       edge.width = ewidth, # discrete values     
-       edge.arrow.size = ewidth*0.4,
+       edge.color = rgb(.1, .1, .1, ewidth/11),
+       edge.width = log10(ewidth)*10,
+       edge.arrow.size = ewidth*0.9,
        edge.curved = 0.2, # to show reciprocal edges
+       )
+  
+  topic.network.metrics <- data.frame(
+    total.deg=degree(good.graf,),
+    in.deg=degree(good.graf, mode='in'),
+    out.deg=degree(good.graf, mode='out'),
+    bet=betweenness(good.graf),
+    clo=closeness(good.graf),
+    eig=evcent(good.graf)$vector,
+    cor=graph.coreness(good.graf)
   )
+  
+  return(topic.network.metrics)
 } 
 
 #### MAIN ####
 
 svg("english_topic_network2.svg")
 par(oma=c(0,0,0,0), mar=c(0,0,0,0))
-load.visualize.network("en_network_matrix.txt", "en_category_count.txt", vcolor="lightblue1")
+eng.cent.measures <- load.visualize.network("en_network_matrix.txt", "en_category_count.txt", vcolor="lightblue1")
+print(eng.cent.measures)
 dev.off()
 
 svg("spanish_topic_network2.svg")
-load.visualize.network("es_network_matrix.txt", "es_category_count.txt", vcolor="darksalmon")
+spa.cent.measures <- load.visualize.network("es_network_matrix.txt", "es_category_count.txt", vcolor="darksalmon")
+print(spa.cent.measures)
 dev.off()

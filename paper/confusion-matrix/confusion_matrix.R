@@ -88,45 +88,100 @@ generate.comparison.df <- function(fa.list.file,
   return(fa.category.comparison)
 }
   
-visualize.confusion.matrix <- function(comp.data) {
-  #### VIZ
-  # Now create a confusion matrix for fa.observed.cats and fa.expected.cats
-  # FROM http://www.findnwrite.com/musings/visualizing-confusion-matrix-in-r/
-  ####
-  
-  # Hack: rename the categories that are not on Wikipedia so they appear at 
-  # the bottom of the matrix -- the diagonal looks nicer.
-  comp.data$Predicted[comp.data$Predicted=="Personal"] <- "-Personal"
-  comp.data$Predicted[comp.data$Predicted=="Explorers"] <- "-Explorers"
+visualize.confusion.matrix <- function(comp.data, 
+                                       add.to.actual, 
+                                       add.to.predicted) {
+  # Create a confusion matrix for predicted and actual categories
+  # Code from http://www.findnwrite.com/musings/visualizing-confusion-matrix-in-r/
   
   #compute frequency of actual categories
   actual1 <- as.data.frame(table(comp.data$Actual))
   names(actual1) <- c("Actual","ActualFreq")
   
+  # Add categories with 0 occurences, to make the matrix square
+  actual1 <- rbind(actual1,
+                   data.frame(Actual=add.to.actual, 
+                              ActualFreq=rep(0, length(add.to.actual)) # vector of zeros
+                              )
+                   )
+  actual1 <- actual1[ order(actual1$Actual),] # sort
+
   #build confusion matrix
   confusion1 <- as.data.frame(table(comp.data$Actual, comp.data$Predicted))
   names(confusion1) <- c("Actual","Predicted","Freq")
+    
+  # Add categories to predicted list to make the matrix square:
+  # to each predicted category we add should be paired with all actual categories
+  # (including acutal categories we add), with a frequency of 0
+  # ...Generate the pairs for predicted
+  freq.pairs.for.predicted <-
+    expand.grid(
+      # existing categories; as.vector required to return strings
+      # (otherwise serial numbers are returned)
+      Actual = c(as.character(unique(confusion1$Actual))), # new categories
+      #Actual = c(unique(confusion1$Actual)), # new categories
+      Predicted = add.to.predicted, 
+      Freq=0)
+  # ...Now do the same for actual
+  freq.pairs.for.actual <- 
+    expand.grid(
+      Actual = add.to.actual, 
+      # existing categories; see note about as.vector above,
+      # Here we also add combinations with the new predicted catrgories
+      # (in add.to.predicted). They should be added only in one expand.grid
+      # call to prevent overlap
+      Predicted = c(as.character(unique(confusion1$Predicted)),
+                    add.to.predicted), # new categories
+      Freq=0)
+  
+  # ...Add to confusion matrix
+  confusion1 <- rbind(confusion1, freq.pairs.for.predicted, freq.pairs.for.actual)
   
   #calculate percentage of test cases based on actual frequency
   confusion1 <- merge(confusion1, actual1, by=c("Actual"))
   confusion1$Percent <- confusion1$Freq/confusion1$ActualFreq*100
   
+  cat(nrow(confusion1),"x",ncol(confusion1),"\n")
+  
+  # Get the accuracy
+  matrix.sum <- sum(confusion1$Percent, na.rm=T)
+  matrix.trace <- sum(confusion1$Percent[confusion1$Actual==confusion1$Predicted],na.rm=T)
+  cat(matrix.trace, "/", matrix.sum, "=", matrix.trace/matrix.sum)
+  
   #render plot
   # we use three different layers
   # first we draw tiles and fill color based on percentage of test cases
+  # USE AS.CHARACTER TO SORT THE MATRIX ALPHABETICALLY: otherwise numeric
+  # sort will be applied, and the records added last (?) will have higher values,
+  # so the drawn matrix won't be symmetric.
+    
   tile <- ggplot() +
-    geom_tile(aes(x=Actual, y=Predicted,fill=Percent),data=confusion1, color="black",size=0.1) +
-    labs(x="Actual",y="Predicted") 
+    geom_tile(aes(x=as.character(Actual), y=as.character(Predicted),fill=Percent),data=confusion1, color="black",size=0.1) +
+    labs(x="Actual",y="Predicted")
   
-  # next we render text values. If you only want to indicate values greater than zero then use data=subset(confusion, Percent > 0)
+  # next we render text values. 
+  # If you only want to indicate values greater than zero then use 
+  # data=subset(confusion, Percent > 0)
   tile <- tile +
-    geom_text(aes(x=Actual,y=Predicted, label=sprintf("%.1f", Percent)),data=confusion1, size=3, colour="black") +
-    scale_fill_gradient(low="grey",high="red")
+    geom_text(aes(x=as.character(Actual),y=as.character(Predicted),
+                  label=sprintf("%.1f", Percent)),
+              data=confusion1, size=5, fontface="bold", colour="black") +
+    scale_fill_gradient(low="grey97",high="red")
   
   # lastly we draw diagonal tiles. We use alpha = 0 so as not to hide previous layers but use size=0.3 to highlight border
-  tile <- tile +
+  tile <<- tile +
     geom_tile(aes(x=Actual,y=Predicted),data=subset(confusion1, as.character(Actual)==as.character(Predicted)), color="black",size=0.3, fill="black", alpha=0) 
   
+  base_size <- 10
+  tile <- tile + theme_grey(base_size = base_size) + 
+    #labs(x = "", y = "") +
+    scale_x_discrete(expand = c(0, 0)) +
+    scale_y_discrete(expand = c(0, 0)) +
+    theme(text = element_text(size = base_size *2),
+          axis.ticks = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust=0, vjust = 0.2, colour = "grey50"),
+          axis.text.y = element_text(colour = "grey50"))
+  print(tile)
   #render
   return(tile)
 }
@@ -136,18 +191,26 @@ cat("ENGLISH\n")
 eng.comp.data <- generate.comparison.df(ENG.FA.LIST, 
                                         ENG.TOPICS.FILE, 
                                         ENG.TOPICS.FA.FILE)
-eng.mat.viz <- visualize.confusion.matrix(eng.comp.data)
+
+# Add categories to predicted list to make the matrix square...
+eng.mat.viz <- visualize.confusion.matrix(eng.comp.data,
+                                          add.to.actual=c("Personal", "Explorers"),
+                                          add.to.predicted=c("-"))
+                                          
 
 par(pty="s")
 postscript("eng_confusion_matrix.eps")
 print(eng.mat.viz)
+#ggsave(eng.mat.viz, file="eng.mat.pdf", width=20, height=20)
 dev.off()
 
-cat("SPANISH\n")
+# cat("SPANISH\n")
 spa.comp.data <- generate.comparison.df(SPA.FA.LIST, 
                                         SPA.TOPICS.FILE, 
                                         SPA.TOPICS.FA.FILE)
-spa.mat.viz <- visualize.confusion.matrix(spa.comp.data)
+spa.mat.viz <- visualize.confusion.matrix(spa.comp.data,
+                                          add.to.actual=c("Personal", "Explorers"),
+                                          add.to.predicted=c("-", "Education"))
 postscript("spa_confusion_matrix.eps")
 print(spa.mat.viz)
 dev.off()

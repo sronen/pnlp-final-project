@@ -1,7 +1,7 @@
 library(reshape)
 library(ggplot2)
 
-postscript("avg_topic_compo2.eps")
+#postscript("avg_topic_compo2.eps")
 
 load.topics.df <- function(filename) {
   # Load DF and assign rownames
@@ -52,4 +52,4 @@ print(p)
 
 print("DONE!")
 
-dev.off()
+#dev.off()

@@ -47,5 +47,5 @@ Missing Featured Articles:
 2) "Fascismo" was removed from the FA files -- not a bio
 3) "Aristóteles" was removed from the FA files into a files of its own - not a FA (it is one of the top ten bios in Spanish)
 4) Still missing (as of 2/19/2013): 
-	English: "AC/DC"
+	English: "AC/DC" -- actually not missing but listed as Acdc in our topic files... omitted from the ACL paper though
 	Spanish: "George Edward Bonsor Saint Martin", "Tutankamon", "Joaquín Sabina", "Elizabeth Bowes-Lyon"   
