@@ -8,11 +8,11 @@
 
 library(ggplot2)
 
-ENG.TOPICS.FILE <- "../../datasets/categories_2013-02-17/en-article-topics-full.txt"
-ENG.TOPICS.FA.FILE <- "../../datasets/categories_2013-02-17/en-article-topics-fa.txt"
+ENG.TOPICS.FILE <- "../../datasets/categories_2013-02-17_final/en-article-topics-full.txt"
+ENG.TOPICS.FA.FILE <- "../../datasets/categories_2013-02-17_final/en-article-topics-fa.txt"
 ENG.FA.LIST <- "../../datasets/wikipedia_bio_lists/top_lists/featured_bios_table_eng.tsv"
-SPA.TOPICS.FILE <- "../../datasets/categories_2013-02-17/es-article-topics-full.txt"
-SPA.TOPICS.FA.FILE <- "../../datasets/categories_2013-02-17/es-article-topics-fa.txt"
+SPA.TOPICS.FILE <- "../../datasets/categories_2013-02-17_final/es-article-topics-full.txt"
+SPA.TOPICS.FA.FILE <- "../../datasets/categories_2013-02-17_final/es-article-topics-fa.txt"
 SPA.FA.LIST <- "../../datasets/wikipedia_bio_lists/top_lists/featured_bios_table_spa.tsv"
 MAPPING.TABLE <- "category_mapping.tsv"
 
