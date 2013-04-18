@@ -213,8 +213,23 @@ def get_featured_wikipedia_articles(dirname, markup=True):
         for j in range(i, min(i+maxthreads, n)):
             wtlist[j].join()
     """
+def download_articles_from_list(filename, new_dir):
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
+
+    f = open(filename, 'r')
+    for line in f.read().split('\n'):
+        print line
+        article_name = line.replace(' ', '_')
+        fi = open(new_dir + '/' + article_name, 'w')
+        fi.write("filler")
+        fi.close()
+    f.close()
 
 def main():
+    if len(sys.argv) > 2 and sys.argv[1] == 'list':
+        download_articles_from_list(sys.argv[2], sys.argv[3])
+        return
     try:
         if len(sys.argv) > 3:
             markup = False

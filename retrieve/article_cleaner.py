@@ -30,13 +30,13 @@ def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, conso
     for subdir in listing: # This could either be a category folder, or an individual file.
         if os.path.isdir(src_dir + '/' + subdir):
             # We are in the setup where we have src_dir/category_dir/file
-            process_subdir(target_dir, src_dir, subdir)
+            process_subdir(target_dir, src_dir, subdir, end_indicators_file, consolidate_folders)
         elif subdir[-4:] == '.txt':
             # We are in the setup where we have src_dir/file, and "subdir" are actually the files
             process_file(src_dir + '/' + subdir, target_dir + '/' + subdir, end_indicators_file)
 
 
-def process_subdir(target_dir, src_dir, subdir, end_indicators_file):
+def process_subdir(target_dir, src_dir, subdir, end_indicators_file, consolidate_folders=True):
     if not consolidate_folders:
         if not os.path.exists(target_dir + '/' + subdir):
             os.mkdir(target_dir + '/' + subdir)
@@ -44,9 +44,9 @@ def process_subdir(target_dir, src_dir, subdir, end_indicators_file):
     files = os.listdir(src_dir + '/' + subdir)
     for filename in files:
         if consolidate_folders:
-            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + filename)
+            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + filename, end_indicators_file)
         else:
-            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + subdir + '/' + filename)
+            process_file(src_dir + '/' + subdir + '/' + filename, target_dir + '/' + subdir + '/' + filename, end_indicators_file)
 
 def process_file(file_path, target_path, end_indicators_file):
         orig_text = open(file_path).read().decode('utf-8')
