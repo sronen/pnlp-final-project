@@ -1,0 +1,10 @@
+0 cricket
+1 royalty
+2 politics
+3 family
+4 church/royalty
+5 music
+6 explorers
+7 literature
+8 military
+9 sports
