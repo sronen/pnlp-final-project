@@ -1,0 +1,10 @@
+0 music
+1 military
+2 politics
+3 royalty
+4 orchestra
+5 literature
+6 art
+7 sports
+8 film/tv
+9 royalty/religion

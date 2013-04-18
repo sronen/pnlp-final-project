@@ -1,0 +1,10 @@
+0 royalty
+1 literature
+2 empire/religion
+3 war/ancient
+4 music/rock
+5 music/orchestra
+6 film
+7 politics/art
+8 generic
+9 family

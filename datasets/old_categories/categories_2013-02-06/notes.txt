@@ -1,2 +1,0 @@
-Feb 5, 2013
-Modelling >50,000 articles with a "readable prose size" > 2kb into 30 topics 
