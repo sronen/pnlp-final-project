@@ -30,7 +30,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
     translate_table = dict((ord(char), translate_to) for char in chars_to_remove)
     return to_translate.translate(translate_table)
 
-def construct_british_dict(british_english_file='british_english_translations.txt'):
+def construct_british_dict(british_english_file='/Users/jbaxter/class/pnlp/british_english_translations.txt'):
 	"""Create dictionary of british -> american"""
 	british_dict = dict()
 
@@ -71,7 +71,7 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	orig_terms = terms
 	orig_st = st
 
-	if language == 'spanish' or (language == 'english' and ENGLISH_FREELING):
+	if language != 'english' or (language == 'english' and ENGLISH_FREELING):
 		"""Lemmatizing before doing any processing ensures the best named entity recognition."""
 		# Lemmatize words if chosen
 		if lemmatize==True:
@@ -141,9 +141,9 @@ def lemmatize_or_stem(language, terms):
 	if language == 'spanish' or (language == 'english' and ENGLISH_FREELING): #TEMPORARY: EXPERIMENTING WITH ENGLISH FREELING
 		# Use FreeLing
 		if language == 'spanish':
-			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/FreeLing/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeLing/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		elif language == 'english':
-			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/FreeLing/config/en.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeLing/config/en.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		terms = map(lambda term: term.encode('utf-8'), terms)
 		analyzeProcess.stdin.write(' '.join(terms))
 		stdout, stderr = analyzeProcess.communicate()
@@ -186,7 +186,7 @@ def remove_stopwords(language, terms, stopwords_file):
 	if stopwords_file == None:
 		STOPWORDS = set(stopwords.words(language))
 	else:
-		# Currently, this path gets taken by Spanish and French, but not English.
+		# Currently, this path gets taken by all but English.
 		STOPWORDS = set()
 		f = open(stopwords_file, 'r')
 		for line in f.readlines():
@@ -196,8 +196,8 @@ def remove_stopwords(language, terms, stopwords_file):
 			word = split[0]
 			STOPWORDS.add(word)
 
-	# for spanish, add all english stopwords too
-	if language == 'spanish':
+	# for non-english, add all english stopwords too
+	if language != 'english':
 		for word in stopwords.words('english'):
 			STOPWORDS.add(word)
 

@@ -31,9 +31,17 @@ def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, conso
         if os.path.isdir(src_dir + '/' + subdir):
             # We are in the setup where we have src_dir/category_dir/file
             process_subdir(target_dir, src_dir, subdir, end_indicators_file, consolidate_folders)
-        elif subdir[-4:] == '.txt':
+        #elif subdir[-4:] == '.txt':
+        else:
             # We are in the setup where we have src_dir/file, and "subdir" are actually the files
-            process_file(src_dir + '/' + subdir, target_dir + '/' + subdir, end_indicators_file)
+            try:
+                if not os.path.exists(target_dir + '/' + subdir):
+                    print 'doing file'
+                    process_file(src_dir + '/' + subdir, target_dir + '/' + subdir, end_indicators_file)
+                else:
+                    print 'olo'
+            except Exception as e:
+                print "Error cleaing file %s" % e
 
 
 def process_subdir(target_dir, src_dir, subdir, end_indicators_file, consolidate_folders=True):

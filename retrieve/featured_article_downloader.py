@@ -1,6 +1,7 @@
 import sys, urllib2, re, string, time, threading
 from BeautifulSoup import BeautifulSoup
 import os, errno
+import random
 
 def mkdir_p(path):
     try:
@@ -52,6 +53,7 @@ def get_specific_wikipedia_article(wiki_url, markup=True, language='en', article
         # extract the text section of the xml. this is the wiki markup text.
         if markup:
             all = re.search(r'<text.*?>(.*)</text', all, flags=re.DOTALL).group(1)
+
             """
             all = re.sub(r'\n', ' ', all)
             all = re.sub(r'\{\{.*?\}\}', r'', all)
@@ -77,20 +79,7 @@ def get_specific_wikipedia_article(wiki_url, markup=True, language='en', article
 
     return(all, articletitle)
 
-class WikiThread(threading.Thread):
-    articles = list()
-    articlenames = list()
-    lock = threading.Lock()
 
-    def run(self):
-        result = get_specific_wikipedia_article(url)
-        if result != None:
-            (article_text, article_title) = result
-            article_title = article_title.replace('/', '_')
-            f = open(new_dir + '/' + article_title, 'w')
-            f.write(article_text)
-        else:
-            print "fail"
 
 def get_new_language_versions_of_downloaded_articles(original_dirname, new_dirname, 
                                                     language='fr', markup=True, original_language='en'):
@@ -213,22 +202,90 @@ def get_featured_wikipedia_articles(dirname, markup=True):
         for j in range(i, min(i+maxthreads, n)):
             wtlist[j].join()
     """
-def download_articles_from_list(filename, new_dir):
-    if not os.path.exists(new_dir):
-        os.makedirs(new_dir)
+    """
+class WikiThread(threading.Thread):
+    articles = list()
+    articlenames = list()
+    lock = threading.Lock()
+
+    def __init__(self, language, article_title):
+        self.article_title = article_title
+        self.language = self.language
+
+    def run(self):
+        result = get_specific_wikipedia_article(None, False, self.language, articletitle=self.article_title)
+        if result != None:
+            (article_text, article_title) = result
+            article_title = article_title.replace('/', '_')
+            f = open(new_dir + '/' + article_title, 'w')
+            f.write(article_text)
+        else:
+            print "fail"
+    """
+    
+def download_articles_from_list(filename, new_dirname, language='en', direction=1):
+    # 1: download all, forward
+    # 2,3: download halves
+    # 4-7: download quarters
+    # 10-17: download eighths
+    print "Downloading articles"
+    if not os.path.exists(new_dirname):
+        os.makedirs(new_dirname)
+    maxthreads = 8
 
     f = open(filename, 'r')
-    for line in f.read().split('\n'):
-        print line
-        article_name = line.replace(' ', '_')
-        fi = open(new_dir + '/' + article_name, 'w')
-        fi.write("filler")
-        fi.close()
+    names = f.read().split('\n')
     f.close()
+    num = len(names)
+
+    if direction == 'random':
+        for i in range(len(names)*4):
+            download(new_dirname, language, names[int(random.random()*len(names))])
+    else:
+        direction = int(direction)
+
+        if direction == 1:
+            for i in range(len(names)):
+                download(new_dirname, language, names[i])
+                print "%d / %d" %(i, num)
+        elif direction == 2 or direction == 3:
+            for i in range((direction-2)*len(names)/2, (direction-1)*len(names)/2, 1):
+                download(new_dirname, language, names[i])
+                print "language: %s, direction: %d, %d / %d" %(language, direction, i, num)
+        elif direction => 4 or direction <= 7:
+            for i in range((direction-4)*len(names)/4, (direction-3)*len(names)/4, 1):
+                download(new_dirname, language, names[i])
+                print "language: %s, direction: %d, %d / %d" %(language, direction, i, num)
+        elif direction == str(-2):
+            for i in range(len(names)/2, 0,-1):
+                download(new_dirname, language, names[i])
+                print "%d / %d" %(i, num)
+        
+        elif direction >= 10:
+            dire = direction - 10
+            for i in range(dire*len(names)/8, (dire+1)*len(names)/8, 1):
+                download(new_dirname, language, names[i])
+                print "language: %s, direction: %d, %d / %d" %(language, direction, i, num)
+
+def download(new_dirname, language, line):
+    if not os.path.exists(new_dirname + '/' + line):
+        try:
+            article_title = urllib2.quote(urllib2.unquote(line))
+            (article_text, article_title) = get_specific_wikipedia_article(None, False, language, articletitle=article_title)
+            newf = open(new_dirname + '/' + urllib2.unquote(article_title), 'w')
+            newf.write(article_text)
+            newf.close()
+            print 'downloaded %s' % article_title
+        except Exception as e:
+            print 'Error: %s' % article_title
+            import traceback
+            traceback.print_exc()
+
+
 
 def main():
     if len(sys.argv) > 2 and sys.argv[1] == 'list':
-        download_articles_from_list(sys.argv[2], sys.argv[3])
+        download_articles_from_list(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         return
     try:
         if len(sys.argv) > 3:
