@@ -1,8 +1,10 @@
 
+# Get names of people from DBPedia instance_type dumps.
+# The dumps are assumed to be in the same folder as this script.
+
 import codecs
 
-LANGS_TO_GET = ["en", "it", "es", "fr", "pt", "de"]
-#LANGS_TO_GET = ["de"]
+LANGS_TO_GET = ["en", "it", "es", "pt"]
 
 INFILE_TEMPLATE = "instance_types_%s.ttl"
 OUTFILE_TEMPLATE = "list_of_%s.txt"
@@ -29,7 +31,7 @@ def get_people_names(lang):
 
 			line_name = line.split()[0] # name is the first part
 			
-			if line_name.find("__") == -1: # remove entries with __ -- a problem with Italian and Spanish
+			if line_name.find("__") == -1: # remove entries with __: these note photos, etc.
 				if lang!="en":
 					person_name = line_name.replace(DBPEDIA_PREFIX_OTHER % (lang), "")
 				else:
