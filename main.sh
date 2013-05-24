@@ -30,7 +30,7 @@ then
 	echo "Usage: ./main.sh language-name wiki-language-code [run-mallet=y/n, default:y]"
 else
 
-PARALLEL_CORPUS=1 # 0
+PARALLEL_CORPUS=2 # 0, 1
 
 # PARAMS
 LANGUAGE=$1
@@ -48,7 +48,8 @@ else
 	ARTICLE_LIST=both_5kb.txt
 fi
 NUM_TOP_WORDS=100
-MALLET_BIN_DIR='/Applications/mallet-2.0.7/bin'
+#MALLET_BIN_DIR='/Applications/mallet-2.0.7/bin'
+MALLET_BIN_DIR='mallet-2.0.7/bin'
 CLASSIFY_DIR='classify'
 RETRIEVE_DIR='retrieve'
 if [ $PARALLEL_CORPUS -eq 1 ]
@@ -65,6 +66,7 @@ then
 else
 	STOPWORDS=n
 fi
+STEMMED_FOLDER_NAME='2kb-lower-nostop-lemma'
 
 if [ $PARALLEL_CORPUS -eq 0 ]
 then
@@ -91,28 +93,28 @@ then
 	fi
 fi
 
-if [ ! -e $DATASETS_DIR/$LANG/lowernostop-stem ]
+if [ ! -e $DATASETS_DIR/$LANG/$STEMMED_FOLDER_NAME ]
 then
-	echo "running lowernostop-stem str_corpus_cleaner"
+	echo "running $STEMMED_FOLDER_NAME str_corpus_cleaner"
 	if [ $PARALLEL_CORPUS -eq 0 ]
 	then
-		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS
+		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/$STEMMED_FOLDER_NAME y n $LANGUAGE y $STOPWORDS
 	else
-		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/lowernostop-stem y n $LANGUAGE y $STOPWORDS $DATASETS_DIR/$ARTICLE_LIST
+		python $CLASSIFY_DIR/tf_idf/str_corpus_cleaner.py $DATASETS_DIR/$LANG/clean $DATASETS_DIR/$LANG/$STEMMED_FOLDER_NAME y n $LANGUAGE y $STOPWORDS $DATASETS_DIR/$ARTICLE_LIST
 	fi
 fi
 
-if [ $RUN_MALLET == "y" ]
-then
+#if [ $RUN_MALLET == "y" ]
+#then
 	echo "running mallet"
 
-	FOLDERNAME=lowernostop-stem
+	FOLDERNAME=$STEMMED_FOLDER_NAME
 	# Run mallet
 	MALLET_ROOT=$DATASETS_DIR/$LANG/mallet
 	#mkdir -p $MALLET_ROOT/lowernostop
-	mkdir -p $MALLET_ROOT/lowernostop-stem
+	mkdir -p $MALLET_ROOT/$STEMMED_FOLDER_NAME
 	#RAW_DATA=$MALLET_ROOT/lowernostop/data.mallet
-	STEM_DATA=$MALLET_ROOT/lowernostop-stem/data.mallet
+	STEM_DATA=$MALLET_ROOT/$STEMMED_FOLDER_NAME/data.mallet
 	# if [ ! -e $RAW_DATA ]
 	# then
 	# 	$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop \
@@ -120,16 +122,18 @@ then
 	# fi
 	if [ ! -e $STEM_DATA ]
 	then
-		$MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/lowernostop-stem \
+	        echo "sup"
+		echo "sudo $MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/$STEMMED_FOLDER_NAME --keep-sequence --output $STEM_DATA --token-regex '[\p{L}\p{M}]+'"
+	        sudo $MALLET_BIN_DIR/mallet import-dir --input $DATASETS_DIR/$LANG/$STEMMED_FOLDER_NAME \
 		--keep-sequence --output $STEM_DATA --token-regex '[\p{L}\p{M}]+'
 	fi
 
 	#for NUM_TOPICS in 10 30 50 200
-	for NUM_TOPICS in 30
+	for NUM_TOPICS in 50 #30
 	do	
 		# RAW_ROOT=$MALLET_ROOT/lowernostop/$NUM_TOPICS
 		# mkdir -p $RAW_ROOT
-		STEM_ROOT=$MALLET_ROOT/lowernostop-stem/$NUM_TOPICS
+		STEM_ROOT=$MALLET_ROOT/$STEMMED_FOLDER_NAME/$NUM_TOPICS
 		mkdir -p $STEM_ROOT
 		# if [ ! \( \( -e $RAW_ROOT/topic-keys.txt \) -a \( -e $RAW_ROOT/doc-topic-proportions.txt \) -a \( -e $RAW_ROOT/state.gz \) \) ]
 		# then
@@ -141,7 +145,7 @@ then
 		# fi
      	if [ ! \( \( -e $STEM_ROOT/topic-keys.txt \) -a \( -e $STEM_ROOT/doc-topic-proportions.txt \) -a \( -e $STEM_ROOT/state.gz \) \) ]
 		then
-			$MALLET_BIN_DIR/mallet train-topics --input $STEM_DATA --num-topics $NUM_TOPICS \
+			sudo $MALLET_BIN_DIR/mallet train-topics --input $STEM_DATA --num-topics $NUM_TOPICS \
 			--output-state $STEM_ROOT/state.gz \
 			--output-doc-topics $STEM_ROOT/doc-topic-proportions.txt \
 			--output-topic-keys $STEM_ROOT/topic-keys.txt \
@@ -149,4 +153,4 @@ then
 		fi
 	done
 	fi
-fi
+#fi

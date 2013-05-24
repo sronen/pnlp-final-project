@@ -6,6 +6,8 @@ import os, sys, time
 import corpus_os
 import shutil
 import string
+from itertools import izip_longest
+import math
 
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -30,7 +32,7 @@ def translate_non_alphanumerics(to_translate, translate_to=u'_',
     translate_table = dict((ord(char), translate_to) for char in chars_to_remove)
     return to_translate.translate(translate_table)
 
-def construct_british_dict(british_english_file='/Users/jbaxter/class/pnlp/british_english_translations.txt'):
+def construct_british_dict(british_english_file='/data/wikiclass/pnlp-cscw/datasets/en/british_english_translations.txt'):
 	"""Create dictionary of british -> american"""
 	british_dict = dict()
 
@@ -138,12 +140,16 @@ def get_clean_terms(s, decap=True, lemmatize=True, language='english', stopwords
 	return terms
 
 def lemmatize_or_stem(language, terms):
-	if language == 'spanish' or (language == 'english' and ENGLISH_FREELING): #TEMPORARY: EXPERIMENTING WITH ENGLISH FREELING
+	if language != 'english' or (language == 'english' and ENGLISH_FREELING): #TEMPORARY: EXPERIMENTING WITH ENGLISH FREELING
 		# Use FreeLing
 		if language == 'spanish':
-			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeLing/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeling/config/es.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                elif language == 'portugese':
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeling/config/pt.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)                    
+                elif language == 'italian':
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeling/config/it.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)                    
 		elif language == 'english':
-			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeLing/config/en.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+			analyzeProcess = subprocess.Popen(["analyze", "-f", "/usr/local/share/freeling/config/en.cfg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 		terms = map(lambda term: term.encode('utf-8'), terms)
 		analyzeProcess.stdin.write(' '.join(terms))
 		stdout, stderr = analyzeProcess.communicate()
@@ -291,7 +297,7 @@ def create_corpus_files(corpus_root, corpus_name=None, lem_flag=True, decap_flag
 
 
 def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, decap_flag=True, 
-								language='english', make_new_dir=False, stopwords_file=None,
+								language='english', make_new_dir=False, stopwords_file=None, direction=1,
 								article_list_file=None):
 	'''
 	Create a file for each article with only clean tokens.
@@ -319,16 +325,39 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 		clean_root = corpus_name
 	else:
 		clean_root = os.path.join(corpus_root, corpus_name)
-	try:
-		os.mkdir(clean_root)
-	except OSError:
-		# alredy exists, delete and recreate
-		shutil.rmtree(clean_root)
-		os.mkdir(clean_root)
-	print "\nCreated folder: ",clean_root
+        if not os.path.exists(clean_root):
+            os.mkdir(clean_root)
+            print "\nCreated folder: ",clean_root
+#	except OSError:
+#		# alredy exists, delete and recreate
+#		shutil.rmtree(clean_root)
+#		os.mkdir(clean_root)
 	
-	
-	for i, doc in enumerate(articles):
+        print '%d total articles' % len(articles)
+        all_indices = range(len(articles))
+
+        if len(articles) > 15000 and len(articles) < 30000:
+            # split into two groups
+            assert direction == 1 or direction == 2
+            num_groups = 2
+        elif len(articles) >= 30000 and len(articles) < 70000:
+            # 4 groups
+            assert direction >= 1 and direction <= 4
+            num_groups = 4
+        elif len(articles) >= 70000:
+            # 6 groups
+            assert direction >= 1 and direction <= 6
+            num_groups = 6
+        print 'processing group %d of %d' % (direction, num_groups)
+        indices = izip_longest(*[iter(all_indices)]*(int(math.ceil(float(len(articles))/num_groups))))
+        article_indices = all_indices
+        for i in range(direction):
+            article_indices = indices.next()
+        print 'double checking length of final article indices:' + str(len(article_indices))
+        for i in article_indices:
+                if i == None:
+                    continue
+                doc = articles[i]
 		print doc
 		# Get all terms in article (repetitions must be preserved!)
 		try:
@@ -351,7 +380,7 @@ def create_corpus_files_separate(corpus_root, corpus_name=None, lem_flag=True, d
 	
 	num_articles = i+1
 	
-	print "\nCreated %d files under %s" % (num_articles, clean_root)
+	print "\nCreated %d files under %s" % (num_articles/num_groups, clean_root)
 	print time.time()-st_time, "seconds\n"
 		
 	return num_articles, clean_root
@@ -384,12 +413,16 @@ if __name__ == "__main__":
 		make_new_dir = False if sys.argv[6]=='n' else True
 	except IndexError:
 		make_new_dir=False
+        try:
+                direction = int(sys.argv[7])
+        except Exception:
+                direction = 1
 	try:
-		stopwords_file = sys.argv[7] if sys.argv[7] != 'n' else None
+		stopwords_file = sys.argv[8] if sys.argv[8] != 'n' else None
 	except IndexError:
 		stopwords_file = None
 	try:
-		article_list_file = sys.argv[8]
+		article_list_file = sys.argv[9]
 	except IndexError:
 		article_list_file = None
 	
@@ -399,6 +432,7 @@ if __name__ == "__main__":
 											decap_flag=decap_flag, 
 											language=language,
 											make_new_dir=make_new_dir,
+                                                                                        direction=direction,
 											stopwords_file=stopwords_file,
 											article_list_file=article_list_file)
 	#path of corpus root, name of sub-folder to create and place files

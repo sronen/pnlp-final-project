@@ -1,16 +1,28 @@
 import sys, re, string, time, os, pickle, random, shutil, unicodedata
 
-def make_article_size_lists(src_dir, file_2kb, file_5kb):
+def make_article_size_lists(src_dir, file_2kb, file_5kb, folder_2kb, folder_5kb):
     list_2kb = list()
     list_5kb = list()
+    
+    if folder_2kb != None and (not os.path.exists(folder_2kb)):
+        os.makedirs(folder_2kb)
+    if folder_5kb != None and (not os.path.exists(folder_5kb)):
+        os.makedirs(folder_5kb)
 
     listing = os.listdir(src_dir)
     for filename in listing:
         filesize = os.path.getsize(src_dir + '/' + filename)
+        f = open(src_dir + '/' + filename, 'r')
+        words = len(f.read().split())
+        f.close()
         if filesize > 1600:
-            list_2kb.append(filename)
+            list_2kb.append(filename + ', %d, %d' % (filesize, words))
+            if folder_2kb != None:
+                shutil.copyfile(src_dir + '/' + filename, folder_2kb + '/' + filename)
             if filesize > 4000:
-                list_5kb.append(filename)
+                list_5kb.append(filename + ', %d, %d' % (filesize, words))
+                if folder_5kb != None:
+                    shutil.copyfile(src_dir + '/' + filename, folder_5kb + '/' + filename)
 
     # write the list of filenames over 2kb to the file
     f = open(file_2kb, 'w')
@@ -217,8 +229,10 @@ if __name__=='__main__':
     elif sys.argv[1] == 'combine':
         combine_article_lists(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     else:
-        make_article_size_lists(sys.argv[1], sys.argv[2], sys.argv[3])
-
+        if len(sys.argv) > 5:
+            make_article_size_lists(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        else:
+            make_article_size_lists(sys.argv[1], sys.argv[2], sys.argv[3], None, None)
 
     # if (len(sys.argv) < 3) or (not os.path.exists(sys.argv[1])):
     #     print "Usage: article_cleaner.py src_dir target_dir end_indicators_file. src_dir must exist."
