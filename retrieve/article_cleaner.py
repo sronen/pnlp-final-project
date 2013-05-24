@@ -5,12 +5,15 @@ def clean_plaintext_article(text, extract, end_indicators_file):
     the Wikipedia API's extract field, which isn't quite plain text, and removes the
     remaining HTML tags."""
     f = open(end_indicators_file, 'r')
-    for line in f.readlines():
+    lines = f.readlines()
+    edit = lines[0].strip()
+    for line in lines[1:]:
         if line.split()[0] == 'exact':
             text = re.sub([a.decode('utf-8') for a in line.split()][1] + r'.*', '', text, flags=re.DOTALL)
         else:
-            text = re.sub(r'&lt;h[23]&gt;\s*' + ' '.join([a.decode('utf-8') for a in line.split()]) + r'\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
+            text = re.sub(r'&lt;h[23]((?!&gt;).)*&gt;\s*' + ' '.join([a.decode('utf-8') for a in line.split()]) + r'\s*(\[.*?\])?\s*&lt;/h[23]&gt;.*', '', text, flags=re.DOTALL)
     
+    text = re.sub(r'(\[\s*?' + edit + r'\s*?\])', '', text) # remove all [edit] markersa
     text = re.sub(r'&amp;amp;', '&', text) # display ampersands properly
     if extract:
         return text
@@ -36,7 +39,6 @@ def make_clean_dataset_directory(src_dir, target_dir, end_indicators_file, conso
             # We are in the setup where we have src_dir/file, and "subdir" are actually the files
             try:
                 if not os.path.exists(target_dir + '/' + subdir):
-                    print 'doing file'
                     process_file(src_dir + '/' + subdir, target_dir + '/' + subdir, end_indicators_file)
                 else:
                     print 'olo'
