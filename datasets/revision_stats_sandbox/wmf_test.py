@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys
+import os, sys, time
 import codecs
 import datetime
 from gzip import GzipFile
@@ -39,6 +39,8 @@ def populate_list_of_persons(infile):
 
 
 if __name__ == "__main__":
+
+	start_time = time.time()
 
 	# Get the path from user input
 	dump_lang = sys.argv[1].lower()
@@ -120,3 +122,5 @@ if __name__ == "__main__":
 	print "ERRORS:"
 	for err in attrib_errors:
 		print err.encode('utf-8') + "||"
+
+	print "time: ", time.time()-start_time
