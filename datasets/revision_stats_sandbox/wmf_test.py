@@ -7,7 +7,9 @@ from wmf import dump
 
 #path = "eswiki-20130429-pages-logging.xml.gz"
 
-DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
+#DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
+DUMP_ROOT = "../../../wiki-dumps/"
+
 
 DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
 	#"pt": "ptwiki-test.xml",
