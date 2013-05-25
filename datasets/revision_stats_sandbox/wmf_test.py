@@ -64,7 +64,8 @@ if __name__ == "__main__":
 	page_count = 0
 	bio_count = 0
 
-	#titles = [] # debug
+	# log the attribute errors
+	attrib_errors = []
 
 	for page_count, page in enumerate(dumpIterator.readPages()):
 		#Do things with a page
