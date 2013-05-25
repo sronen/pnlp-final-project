@@ -107,6 +107,7 @@ if __name__ == "__main__":
 			except AttributeError:
 				print "AttribError in", decoded_title.encode('utf-8'), "skipping"
 				attrib_errors.append(decoded_title)
+				break # skip to next articel
 
 		fout.write("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]) + "\n")
 		#print("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]))
