@@ -5,14 +5,10 @@ import datetime
 from gzip import GzipFile
 from wmf import dump
 
-#path = "eswiki-20130429-pages-logging.xml.gz"
-
-#DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
+# DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
 DUMP_ROOT = "../../../wiki-dumps/"
 
-
 DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
-	#"pt": "ptwiki-test.xml",
 	"pt": "ptwiki-20130505-stub-meta-history.xml",
 	"es": "eswiki-20130429-stub-meta-history.xml",
 	"it": "itwiki-20130513-stub-meta-history.xml" }
@@ -109,6 +105,7 @@ if __name__ == "__main__":
 				unique_editors.add(revision.getContributor().getUsername())
 			except AttributeError:
 				print "AttribError in", decoded_title.encode('utf-8'), "skipping"
+				attrib_errors.append(decoded_title)
 
 		fout.write("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]) + "\n")
 		#print("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]))
@@ -117,3 +114,7 @@ if __name__ == "__main__":
 	fp.close()
 
 	print "total:", page_count, " ppl:", bio_count
+
+	print "ERRORS:"
+	for err in attrib_errors:
+		print err.encode('utf-8') + "||"
