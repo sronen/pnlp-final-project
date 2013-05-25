@@ -18,6 +18,7 @@ DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
 LIST_OF_BIOS_IN_LANG = "../%s/2kb-ok.txt"
 
 OUTPUT_FILE = "results/output_%s.txt"
+ERROR_FILE = "results/error_%s.txt"
 
 '''
 Accent matching! - handled thru manually matching stuff!
@@ -63,6 +64,7 @@ if __name__ == "__main__":
 		populate_list_of_persons(LIST_OF_BIOS_IN_LANG % dump_lang)
 
 	fout = open(OUTPUT_FILE % dump_lang, "w")
+	ferror = open(ERROR_FILE % dump_lang, "w")
 	page_count = 0
 	bio_count = 0
 
@@ -89,8 +91,10 @@ if __name__ == "__main__":
 				continue
 		except UnicodeEncodeError:
 				print "UnicodeException: X " + decoded_title
+				ferror.write("UnicodeEncode: %s \n" % decoded_title.encode('utf-8'))
 		except Exception:
 				print "Exception: X " + decoded_title
+				ferror.write("Other: %s \n" % decoded_title.encode('utf-8'))
 
 		bio_count += 1
 
@@ -109,6 +113,7 @@ if __name__ == "__main__":
 			except AttributeError:
 				print "AttribError in", decoded_title.encode('utf-8'), "skipping"
 				attrib_errors.append(decoded_title)
+				ferror.write("Attrib: %s \n" % decoded_title.encode('utf-8'))
 				break # skip to next articel
 
 		fout.write("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]) + "\n")
