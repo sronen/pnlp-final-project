@@ -121,6 +121,7 @@ if __name__ == "__main__":
 
 	fout.close()
 	fp.close()
+	ferror.close()
 
 	print "total:", page_count, " ppl:", bio_count
 
