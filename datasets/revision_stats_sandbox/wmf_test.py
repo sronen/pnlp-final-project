@@ -5,11 +5,12 @@ import datetime
 from gzip import GzipFile
 from wmf import dump
 
-# DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
+#DUMP_ROOT = "../wikipedia_stub_meta_history/" # update accordingly
 DUMP_ROOT = "../../../wiki-dumps/"
 
 DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
 	"pt": "ptwiki-20130505-stub-meta-history.xml",
+	#"pt": "ptwiki-test.xml",
 	"es": "eswiki-20130429-stub-meta-history.xml",
 	"it": "itwiki-20130513-stub-meta-history.xml" }
 
@@ -125,10 +126,10 @@ if __name__ == "__main__":
 			#print("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]))
 
 	print "total:", page_count, " ppl:", bio_count
-	fout.write("total: " + page_count + " ppl: " + bio_count + "\n")
+	fout.write("total: %d ppl: %d\n" % (page_count, bio_count))
 
 	print "time: ", time.time()-start_time
-	fout.write("time: " + time.time()-start_time + "\n")
+	fout.write("time: " + str(time.time()-start_time) + "\n")
 
 	fout.close()
 	fp.close()
