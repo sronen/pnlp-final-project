@@ -103,6 +103,8 @@ if __name__ == "__main__":
 
 		rev_count = 0
 
+		attrib_error = False # flag for attribute errors
+
 		for revision in page.readRevisions():
 			#Do things with a revision
 			#like extracting its text: revision.getText()
@@ -114,19 +116,24 @@ if __name__ == "__main__":
 				print "AttribError in", decoded_title.encode('utf-8'), "skipping"
 				attrib_errors.append(decoded_title)
 				ferror.write("Attrib: %s \n" % decoded_title.encode('utf-8'))
-				break # skip to next articel
+				attrib_error = True
+				break # stop processing this article
 
-		fout.write("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]) + "\n")
-		#print("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]))
+		if attrib_error==False:
+			# Write value only if there aren't any errors
+			fout.write("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]) + "\n")
+			#print("\t".join(str(v) for v in [decoded_title.encode('utf-8'), page.getId(), rev_count, len(unique_editors), rev1_time]))
+
+	print "total:", page_count, " ppl:", bio_count
+	fout.write("total: " + page_count + " ppl: " + bio_count + "\n")
+
+	print "time: ", time.time()-start_time
+	fout.write("time: " + time.time()-start_time + "\n")
 
 	fout.close()
 	fp.close()
 	ferror.close()
 
-	print "total:", page_count, " ppl:", bio_count
-
 	print "ERRORS:"
 	for err in attrib_errors:
 		print err.encode('utf-8') + "||",
-
-	print "time: ", time.time()-start_time
