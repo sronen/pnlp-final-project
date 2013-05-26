@@ -17,8 +17,8 @@ DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
 # from DBpedia. We want to get revision history for these articles only.
 LIST_OF_BIOS_IN_LANG = "../%s/2kb-ok.txt"
 
-OUTPUT_FILE = "results/output_%s.txt"
-ERROR_FILE = "results/error_%s.txt"
+OUTPUT_FILE = "results/output_%s_take2.txt"
+ERROR_FILE = "results/error_%s_take2.txt"
 
 '''
 Accent matching! - handled thru manually matching stuff!
@@ -86,14 +86,14 @@ if __name__ == "__main__":
 
 		try:
 			if decoded_title not in list_of_persons:
-				fout.write("X " + decoded_title.encode('utf-8') + "\n")
+				#fout.write("X " + decoded_title.encode('utf-8') + "\n")
 				#print "X " + encoded_title
 				continue
 		except UnicodeEncodeError:
-				print "UnicodeException: X " + decoded_title
+				#print "UnicodeException: X " + decoded_title
 				ferror.write("UnicodeEncode: %s \n" % decoded_title.encode('utf-8'))
 		except Exception:
-				print "Exception: X " + decoded_title
+				#print "Exception: X " + decoded_title
 				ferror.write("Other: %s \n" % decoded_title.encode('utf-8'))
 
 		bio_count += 1
@@ -127,6 +127,6 @@ if __name__ == "__main__":
 
 	print "ERRORS:"
 	for err in attrib_errors:
-		print err.encode('utf-8') + "||"
+		print err.encode('utf-8') + "||",
 
 	print "time: ", time.time()-start_time
