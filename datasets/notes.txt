@@ -1,0 +1,20 @@
+Notes 
+
+###
+# (1) Convert the ", " separated size files to tab-separated
+# (2) Copy the 2kb-sizes-tabs.txt and the 2kb-ok.txt files to Excel.
+# (3) Sort the columns on both, then copy the names from 2kb-ok next to the sizes.
+# (4) Copy the result to a new text file and sav to 2kb-sizes-fixed.txt, and load to R
+###
+
+TODO: 
+correct article names in size tables for ES and IT
+merge with rev history
+merge with # topics
+
+Find:
+- Avg. revs per editor compared to number of topics
+- What's the avg. number of revs/day, editors/day, revs/editors per each topic?
+
+
+- Most edited topics / most actively edited topics - are these local people?
