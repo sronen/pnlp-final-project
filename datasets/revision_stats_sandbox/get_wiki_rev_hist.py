@@ -18,8 +18,8 @@ DUMP_FILES = {"en": "enwiki-20130503-stub-meta-history.xml",
 # from DBpedia. We want to get revision history for these articles only.
 LIST_OF_BIOS_IN_LANG = "../%s/2kb-ok.txt"
 
-OUTPUT_FILE = "results/output_%s_take2.txt"
-ERROR_FILE = "results/error_%s_take2.txt"
+OUTPUT_FILE = "results/%s_output_take2.txt"
+ERROR_FILE = "results/%s_error_take2.txt"
 
 '''
 Accent matching! - handled thru manually matching stuff!
