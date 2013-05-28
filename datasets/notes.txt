@@ -8,8 +8,7 @@ Notes
 ###
 
 TODO: 
-correct article names in size tables for ES and IT
-merge with rev history
+Add missing entries
 merge with # topics
 
 Find:
