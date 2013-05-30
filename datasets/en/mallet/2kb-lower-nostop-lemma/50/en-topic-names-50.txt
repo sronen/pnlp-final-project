@@ -1,0 +1,50 @@
+0	Religion	Religion (catholicism)
+1	Warfare	Warfare (historical?)
+2	Politics	govt and politics - socialism/activism
+3	Exploration	exploration and development
+4	Music	music - calssical
+5	[] career?
+6	[]
+7	Sports	sports - some golf
+8	Business	business
+9	[Success?]	awards? career? no identifiable field
+10	Education	education - learning
+11	Humanities	philosophy - intellectualism - humanity?
+12	Personal	personal life
+13	[non-profit?]
+14	Art	building and architecture
+15	Law	law and crime
+16	Music	music - popoular
+17	[] TV scripts?
+18	Warfare	warfare and military (career)
+19	Literature	literature and writing
+20	Royalty	royalty
+21	Media	gossip
+22	Media	media - tv, film
+23	Science	technology , products, engine
+24	Media	media - tv, movie, some celb
+25	Sports	sports - soccer
+26	Media	media - talk shows, reality?
+27	[]	Comics? gaming?
+28	Politics	politics
+29	Politics	politics
+30	Science	hard sciences - math phys
+31	[career]	govt office?
+32	[] chinese refernces?
+33	Sports	sports = baseball
+34	Warfare	warfare - aviation
+35	[]
+36	[]
+37	Sports	sports - basketball, football, soccer, team sports
+38	Art	visual arts - painting, photography
+39	Sports	sports  - cricket
+40	Music	music popular
+41	Sports	sports - racing (car/moto/bicycle)
+42	[]
+43	Personal	personal life - illness/injury
+44	[]
+45	Sports	sports - boxing
+46	[]
+47	Art	literature - comics fantasy
+48	Sports	sports - tennis, wresting, etc
+49	Law	law

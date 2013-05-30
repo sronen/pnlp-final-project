@@ -1,0 +1,30 @@
+0	Music - popular
+1	[]
+2	[]
+3	Exploration?
+4	Literature and writing
+5	Watfare
+6	Politics - socialism? (similar to the spanish category)
+7	career
+8	sports - baseball? cricket?
+9	politics - election and administraion
+10	war - comics?	(similar to spanish category)
+11	music - jazz/folk
+12	[]
+13	business
+14	philosohpy? humanities?
+15	media - film, TV
+16	nobility and religion?
+17	sports - boxing
+18	[]
+19	visual arts - painting, photo., sculpture...
+20	sports - no particular game
+21	education/academia
+22	media - celebrities, tv
+23	sports - football (american)
+24	sports - soccer
+25	sports - rugby and cricket
+26	science and tech
+27	personal ife
+28 	sports - athletics?
+29	law and crime

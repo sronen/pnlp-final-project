@@ -1,0 +1,50 @@
+0	[]
+1	[]
+2	Art	painting, architec.
+3	[]
+4	Sports
+5	[]	Race? gender?
+6	Music	popular
+7	Media	Theater, telenovela, TV
+8	Exploration
+9	[]	European countries
+10	Personal	
+11	[]	Anicent cultures?
+12	[]
+13	Sports	boxing?
+14	Humanities	European history?
+15	Personal	Royalty
+16	Exploration	Space (only lang with such category!)
+17	Media	movies, acting
+18	Personal	illness
+19	Sports	Olympics? athletics, swiming, racing,
+20	[]
+21	Media	gossip, celebs,
+22	[]	Community life?
+23	Sports	team sports
+24	Media	talk show? radio
+25	[Success]	
+26	[]
+27	Religion	(mostly catholicism, but not only)
+28	Music	popular
+29	Education	school + academia
+30	Media	TV series
+31	Sports	athletics, gymnastics
+32	[]
+33	Music	classical
+34	[Local]
+35	Warfare
+36	Music	popular
+37	Sports	team sports
+38	Law	...and Crime
+39	Humanities	philosophy / intellectualism
+40	Literature	...and writing
+41	[]
+42	Royalty	Politics/warfare
+43	[]
+44	Politics	...and govt
+45	Politics	...and govt
+46	Politics	Socialism/revolustion
+47	[RPG?]
+48	Science
+49	Business

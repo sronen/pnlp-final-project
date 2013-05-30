@@ -1,0 +1,50 @@
+0	Media	Gossip? sexual orientation?
+1	Personal	illness
+2	Sports	various sports
+3	Science	Biology
+4	Media	TV and Film
+5	[]
+6	Warfare
+7	Business
+8	Personal	death
+9	[]	success
+10	[]	awards and recognition? hard to pin particular domain
+11	Politics	socialism/revolution
+12	[]	script? story?
+13	Music	classical
+14	[]	
+15	Music	popular
+16	Sports	general, some tennis
+17	[]	European history? migration?
+18	[Local]	Spanish cities ("local" category)
+19	Music
+20	Exploration	(lots of sea travel!)
+21	[]	
+22	Politics
+23	Religion	(catholicism)
+24	Law	(mostly crime, not law)
+25	[Local]	Central American? Ecuador to Mexico
+26	Politics	...and govt
+27	[]
+28	Literature	...and writing
+29	[]
+30	Education	school for children
+31	Humanities	Philosophy
+32	Sports	team sports
+33	[]
+34	Media	TV mostly
+35	Art	painting, sculpting, photo
+36	[]
+37	[]
+38	Education	academia
+39	Warfare
+40	[Local]	South american
+41	Personal	pers. life
+42	[]
+43	Music	popular
+44	Media	radio, ads, reality, etc.
+45	[]	RPG?
+46	Sports	soccer
+47	[]
+48	Science	Math
+49	Literature	...and writing

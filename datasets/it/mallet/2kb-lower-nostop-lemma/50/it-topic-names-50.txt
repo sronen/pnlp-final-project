@@ -1,0 +1,50 @@
+0	Politics
+1	[]
+2	Education	mostly academia
+3	Art	Comics	
+4	Literature	...and writing	
+5	Art	painting, design
+6	[]	Fanstasy? gaming? RPG?
+7	[]
+8	[]	RPG?
+9	[]	Middle east?
+10	Politics	Intl relations?
+11	[]
+12	[]	Music and writing? more biographical i believe
+13	Politics	...and gov't
+14	Science	...and Tech: Hard sciences
+15	Business
+16	Sports	boxing, wrestling
+17	Sports	Olympics
+18	Sports	Soccer
+19	[]
+20	Exploration	...and Travel and Dev.
+21	Media	Movies
+22	[Career?]
+23	Personal	...life
+24	Personal	illness and unjury
+25	Art	Photo, comic, illustration
+26	Media	TV, film	
+27	[] Script? Mostly about women
+28	Sports	racing
+29	[]	Career?  Italian cities, etc.
+30	[]	Career?
+31	[]	Sports?
+32	Humanities	?history/classics
+33	Law	Crime	
+34	Music	classic/opera
+35	Royalty	royalty/warfare
+36	Humanities	philospihy? intellectualism?
+37	Music	Popular
+38	Sports	basketball, some fottball?
+39	[]	Career?
+40	Royalty	royalty: personal life
+41	[]
+42	Religion
+43	Music	popular
+44	[]
+45	Warfare
+46	[]
+47	[]
+48	Media	TV/celebs
+49	Religion	Catholicism

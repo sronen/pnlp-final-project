@@ -1,0 +1,30 @@
+0	[]
+1	Exploration
+2	[]
+3	Movies, TV, theater
+4	Literature, writing
+5	Politics - revolution/activism?
+6	[] Media?
+7	TV, some gossip - Media - telenovella prominent word...
+8	Sports - olympics?
+9	Art: painting, word "book", achitecture, photography, etc. 
+10	?
+11	Warfare
+12	Politics and Government
+13	Sports- team sports, mostly soccer?
+14	Science and tech
+15	biology + many german and french
+16	[] -- looks like telenovela scripts...
+17	Music (popular?)
+18	Sports - basketball?
+19	Music - popular?
+20	Religion (catholicism) and nobility
+21	[] philosophy?
+22	[] gaming? comics?
+23	Music: classical and jazz
+24	Personal life
+25	Law and crime?
+26	War? superheros?
+27	Education / Academia
+28	Business
+29	[]
