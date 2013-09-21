@@ -1,0 +1,1 @@
+Wikipedia dump (Portuguese) for testing the revision history preparation scripts.
