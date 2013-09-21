@@ -1,4 +1,4 @@
-#source('../datasets/prep_data.R', chdir=T)
+#source('../../datasets/prep_data.R', chdir=T)
 
 # preliminary analysis
 
@@ -29,7 +29,8 @@ find.bin.probs <-function(x, bin.breaks) {
 plot.topic.distribution.figure <- function(article.topic.nums) { 
   # temp hack to force the same number of breaks in all languages:
   # if an integer is passed, e.g, breaks=20, R uses it only as a recommedation only.
-  # TODO: use min and max values from the DF. 
+  # TODO: use min and max values from the DF, instead of hard-coding in the
+  # following line
   bin.breaks <- seq(1.0, 5.2, 0.2)
     
   bins <- ddply(article.topic.nums, 'language', .progress = "text", 

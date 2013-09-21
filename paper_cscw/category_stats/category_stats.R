@@ -1,3 +1,5 @@
+source('../../datasets/prep_data.R', chdir=T)
+
 # Entropy equation for latex:
 
 #\usepackage{amsmath}
@@ -36,6 +38,7 @@ plot.donuts <- function(cat.stats) {
 
 plot.category.shares.donut <- function(dat, lang) {
   # Plot a donut chart for a language showing the share of each category
+  print(head(dat))
   
   # Add additional columns, needed for drawing with geom_rect.
   dat = dat[order(dat$percent.articles), ]
@@ -68,7 +71,6 @@ plot.category.shares.donut <- function(dat, lang) {
 
 
 ### MAIN ####
-#source('../datasets/prep_data.R', chdir=T)
 
 ## Category shares
 en.cat.stats <- prep.category.stats.table(en.article.stats, "English")
